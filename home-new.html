@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <title>Clinica Dentale Albania - Turismo Dentale di Qualità</title>
+
+    <!-- External Libraries -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+
+    <!-- Custom Fonts -->
+    <link rel="stylesheet" media="screen" href="https://fontlibrary.org//face/xb-niloofar" type="text/css"/>
+    <link href="https://cdn.jsdelivr.net/gh/fontalternative/glacial-indifference/font.css" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-color: #2C5AA0;
+            --secondary-color: #4A90E2;
+            --success-color: #34C759;
+            --warning-color: #FF9500;
+            --danger-color: #FF3B30;
+            --dark-color: #1C1C1E;
+            --gray-1: #6B6B6B;
+            --gray-2: #8E8E93;
+            --gray-3: #C7C7CC;
+            --gray-4: #E5E5EA;
+            --gray-5: #261F56;
+            --white: #FFFFFF;
+            --off-white: #F5F5F5;
+            --purple-grey: #261F56;
+            --nav-bg: #F7F7F8;
+            --gradient-primary: linear-gradient(135deg, #2C5AA0 0%, #4A90E2 100%);
+            --shadow-sm: 0 2px 10px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 20px rgba(0,0,0,0.12);
+            --shadow-lg: 0 10px 40px rgba(0,0,0,0.15);
+            --border-radius: 12px;
+            --border-radius-lg: 20px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            line-height: 1.5;
+            color: var(--dark-color);
+            background-color: var(--purple-grey);
+            overflow-x: hidden;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: var(--nav-bg);
+            box-shadow: var(--shadow-sm);
+            padding: 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            text-decoration: none;
+            padding: 15px 20px;
+            margin-right: 40px;
+            transition: transform 0.3s;
+        }
+
+        .navbar-brand:hover {
+            transform: scale(1.02);
+        }
+
+        .brand-main {
+            font-size: 56px;
+            font-weight: bold;
+            color: #261F56;
+            line-height: 1;
+            letter-spacing: -0.02em;
+            font-family: 'XB NiloofarRegular', 'XB Niloofar', Arial, sans-serif;
+        }
+
+        .brand-subtitle {
+            font-size: 14px;
+            font-weight: 500;
+            color: #261F56;
+            margin-top: 4px;
+            font-family: 'Glacial Indifference', Arial, Helvetica, sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-link {
+            color: var(--purple-grey);
+            font-weight: 500;
+            padding: 8px 16px;
+            line-height: 1.5;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            outline: none;
+            margin: 0 4px;
+            background: transparent;
+            border: none;
+            text-decoration: none;
+        }
+
+        .nav-link:hover {
+            color: var(--primary-color);
+            background: transparent;
+            font-weight: 600;
+            text-decoration: none;
+        }
+        .nav-link:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+
+        .dropdown-item {
+            color: var(--purple-grey);
+            line-height: 1.5;
+        }
+
+        .dropdown-item:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: -2px;
+        }
+
+        .dropdown-menu {
+            border: none;
+            box-shadow: var(--shadow-md);
+            border-radius: var(--border-radius);
+        }
+
+        .navbar-toggler:focus {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+            box-shadow: none;
+        }
+
+        /* Hero Section */
+        .hero-section {
+            background: var(--purple-grey);
+            color: var(--white);
+            padding: 80px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('../pictures/tirana.jpg') center/cover;
+            opacity: 0.15;
+            z-index: 0;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-title {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 24px;
+            line-height: 1.2;
+            letter-spacing: -0.03em;
+        }
+
+        .hero-subtitle {
+            font-size: 1.25rem;
+            margin-bottom: 32px;
+            opacity: 0.95;
+        }
+
+        .hero-benefits {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 32px;
+        }
+
+        .hero-benefits li {
+            padding: 12px 0;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+        }
+
+        .hero-benefits li i {
+            color: var(--success-color);
+            margin-right: 12px;
+            font-size: 1.3rem;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: var(--white);
+            color: var(--purple-grey);
+            padding: 16px 48px;
+            border-radius: 100px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            box-shadow: var(--shadow-md);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+            color: var(--purple-grey);
+        }
+
+        /* Section Styles */
+        .section {
+            padding: 80px 0;
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+            color: var(--purple-grey);
+            text-align: center;
+        }
+
+        .section[style*="purple-grey"] .section-title {
+            color: var(--white);
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            color: var(--gray-1);
+            margin-bottom: 48px;
+            text-align: center;
+        }
+
+        .section[style*="purple-grey"] .section-subtitle {
+            color: var(--off-white);
+        }
+
+        /* Why Choose Albania */
+        .feature-card {
+            background: var(--off-white);
+            padding: 32px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+            transition: all 0.3s;
+            height: 100%;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            color: var(--purple-grey);
+            margin-bottom: 16px;
+        }
+
+        .feature-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--purple-grey);
+        }
+
+        .feature-description {
+            font-size: 1rem;
+            color: var(--gray-1);
+            line-height: 1.6;
+        }
+
+        /* Clinics Section */
+        .clinic-card {
+            background: var(--off-white);
+            border-radius: var(--border-radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s;
+            text-decoration: none;
+            color: inherit;
+            display: block;
+        }
+
+        .clinic-card:hover {
+            transform: translateY(-8px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .clinic-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+        }
+
+        .clinic-content {
+            padding: 32px;
+        }
+
+        .clinic-badge {
+            display: inline-block;
+            background: var(--purple-grey);
+            color: var(--white);
+            padding: 6px 16px;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .clinic-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--purple-grey);
+        }
+
+        .clinic-description {
+            font-size: 1rem;
+            color: var(--gray-1);
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+
+        .clinic-features {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 24px;
+        }
+
+        .clinic-features li {
+            padding: 8px 0;
+            display: flex;
+            align-items: center;
+            font-size: 0.95rem;
+            color: var(--dark-color);
+        }
+
+        .clinic-features li i {
+            color: var(--success-color);
+            margin-right: 12px;
+        }
+
+        .view-clinic-btn {
+            display: inline-block;
+            background: var(--purple-grey);
+            color: var(--white);
+            padding: 12px 32px;
+            border-radius: 100px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .view-clinic-btn:hover {
+            transform: translateX(5px);
+            color: var(--white);
+            background: var(--primary-color);
+        }
+
+        /* Testimonials */
+        .testimonial-card {
+            background: var(--off-white);
+            padding: 32px;
+            border-radius: var(--border-radius-lg);
+            box-shadow: var(--shadow-sm);
+            text-align: center;
+            height: 450px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .testimonial-image {
+            width: 100%;
+            height: 320px;
+            object-fit: contain;
+            border-radius: var(--border-radius);
+            margin-bottom: 16px;
+            background: var(--white);
+        }
+
+        .testimonial-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--purple-grey);
+            margin-bottom: 4px;
+        }
+
+        .testimonial-rating {
+            color: var(--warning-color);
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+        }
+
+        /* Tour Guide Section - Carousel */
+        .tour-carousel {
+            position: relative;
+        }
+
+        .tour-card {
+            background: var(--off-white);
+            border-radius: var(--border-radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: row;
+            align-items: stretch;
+            margin: 0 10px;
+            min-height: 280px;
+        }
+
+        .tour-image {
+            width: 40%;
+            min-height: 280px;
+            object-fit: cover;
+        }
+
+        .tour-content {
+            padding: 24px;
+            width: 60%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .tour-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--purple-grey);
+        }
+
+        .tour-description {
+            font-size: 0.95rem;
+            color: var(--gray-1);
+            line-height: 1.6;
+        }
+
+        .carousel-control-prev,
+        .carousel-control-next {
+            width: 50px;
+            height: 50px;
+            background-color: var(--purple-grey);
+            border-radius: 50%;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.9;
+        }
+
+        .carousel-control-prev:hover,
+        .carousel-control-next:hover {
+            opacity: 1;
+            background-color: var(--primary-color);
+        }
+
+        .carousel-control-prev {
+            left: -25px;
+        }
+
+        .carousel-control-next {
+            right: -25px;
+        }
+
+        .carousel-indicators {
+            bottom: -40px;
+        }
+
+        .carousel-indicators button {
+            background-color: var(--purple-grey);
+        }
+
+        @media (max-width: 768px) {
+            .tour-card {
+                flex-direction: column;
+            }
+
+            .tour-image {
+                width: 100%;
+                height: 200px;
+                min-height: 200px;
+            }
+
+            .tour-content {
+                width: 100%;
+            }
+
+            .carousel-control-prev {
+                left: 10px;
+            }
+
+            .carousel-control-next {
+                right: 10px;
+            }
+        }
+
+        /* About Section */
+        .about-section {
+            background: var(--off-white);
+        }
+
+        .stats-card {
+            background: var(--white);
+            padding: 32px;
+            border-radius: var(--border-radius-lg);
+            text-align: center;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 900;
+            color: var(--purple-grey);
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            color: var(--gray-1);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--dark-color);
+            color: var(--white);
+            padding: 60px 0 20px 0;
+        }
+
+        .footer-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+        }
+
+        .footer-link {
+            color: var(--gray-2);
+            text-decoration: none;
+            display: block;
+            padding: 8px 0;
+            transition: color 0.3s;
+        }
+
+        .footer-link:hover {
+            color: var(--white);
+        }
+
+        /* WhatsApp Float */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: var(--success-color);
+            color: var(--white);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .whatsapp-float:hover {
+            transform: scale(1.1);
+            color: var(--white);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .brand-main {
+                font-size: 42px;
+            }
+
+            .brand-subtitle {
+                font-size: 12px;
+            }
+
+            .navbar-brand {
+                padding: 10px 15px;
+                margin-right: 20px;
+            }
+
+            .navbar {
+                padding: 0;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .section-title {
+                font-size: 1.8rem;
+            }
+
+            .hero-section {
+                padding: 60px 0;
+            }
+
+            .section {
+                padding: 60px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg">
+    <div class="container">
+        <a class="navbar-brand" href="home-new.html">
+            <div class="brand-main">CDA</div>
+            <div class="brand-subtitle">Clinica Dentale Albania</div>
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="#home">Home</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                        La Nostra Clinica
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="index.html">San Marco Dental</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#about">Chi Siamo</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#tour">Guida Turistica</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#testimonials">Testimonianze</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Hero Section -->
+<section class="hero-section" id="home">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-7">
+                <div class="hero-content">
+                    <h1 class="hero-title">Il Tuo Sorriso Perfetto ti Aspetta in Albania</h1>
+                    <p class="hero-subtitle">Risparmia fino al 75% sui trattamenti dentali con la massima qualità europea. A solo 1 ora di volo dall'Italia.</p>
+                    <ul class="hero-benefits">
+                        <li><i class="fas fa-check-circle"></i> Cliniche certificate con specialisti italiani</li>
+                        <li><i class="fas fa-check-circle"></i> Garanzia a vita sugli impianti dentali</li>
+                        <li><i class="fas fa-check-circle"></i> Viaggio, hotel e trasporto inclusi</li>
+                        <li><i class="fas fa-check-circle"></i> Oltre 3500 pazienti italiani soddisfatti ogni anno</li>
+                    </ul>
+                    <a href="#clinics" class="cta-button">Scopri le Nostre Cliniche</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Why Choose Albania -->
+<section class="section" style="background: var(--off-white);">
+    <div class="container">
+        <h2 class="section-title">Perché Scegliere l'Albania per le Cure Dentali?</h2>
+        <p class="section-subtitle">Qualità europea, prezzi vantaggiosi e un'esperienza unica</p>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <i class="fas fa-piggy-bank feature-icon"></i>
+                    <h3 class="feature-title">Risparmia fino al 75%</h3>
+                    <p class="feature-description">Prezzi trasparenti e competitivi senza compromettere la qualità. Costi fino a 4 volte inferiori rispetto all'Italia.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <i class="fas fa-award feature-icon"></i>
+                    <h3 class="feature-title">Qualità Certificata</h3>
+                    <p class="feature-description">Cliniche moderne con tecnologie all'avanguardia e materiali certificati CE. Specialisti con formazione internazionale.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <i class="fas fa-plane-departure feature-icon"></i>
+                    <h3 class="feature-title">Viaggio Organizzato</h3>
+                    <p class="feature-description">Pacchetto completo con volo, hotel e trasporti. A solo 1 ora di volo dall'Italia, con assistenza in italiano.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <i class="fas fa-shield-alt feature-icon"></i>
+                    <h3 class="feature-title">Garanzie Reali</h3>
+                    <p class="feature-description">Garanzia a vita sugli impianti dentali. Soddisfatti o rimborsati al 100%. Assistenza post-intervento garantita.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <i class="fas fa-user-md feature-icon"></i>
+                    <h3 class="feature-title">Specialisti Italiani</h3>
+                    <p class="feature-description">Équipe mediche con dentisti italiani specializzati. Comunicazione senza barriere linguistiche.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <i class="fas fa-map-marked-alt feature-icon"></i>
+                    <h3 class="feature-title">Turismo + Cure</h3>
+                    <p class="feature-description">Approfitta del soggiorno per scoprire Tirana e l'Albania. Cultura, storia e bellezze naturali a portata di mano.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Clinics Section -->
+<section class="section" id="clinics" style="background: var(--purple-grey);">
+    <div class="container">
+        <h2 class="section-title">Le Nostre Cliniche Partner</h2>
+        <p class="section-subtitle">Strutture certificate e specializzate nel turismo dentale</p>
+
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <a href="index.html" class="clinic-card">
+                    <img src="images/staff-photo.webp" alt="San Marco Dental Clinic" class="clinic-image">
+                    <div class="clinic-content">
+                        <span class="clinic-badge">Clinica Certificata</span>
+                        <h3 class="clinic-name">San Marco Dental</h3>
+                        <p class="clinic-description">La clinica leader nel turismo dentale in Albania. Con oltre 3500 pazienti italiani soddisfatti ogni anno, San Marco Dental offre trattamenti di eccellenza con garanzie reali.</p>
+
+                        <ul class="clinic-features">
+                            <li><i class="fas fa-check-circle"></i> Specialisti italiani certificati</li>
+                            <li><i class="fas fa-check-circle"></i> Tecnologie digitali all'avanguardia</li>
+                            <li><i class="fas fa-check-circle"></i> Garanzia a vita sugli impianti</li>
+                            <li><i class="fas fa-check-circle"></i> Pacchetto viaggio completo incluso</li>
+                            <li><i class="fas fa-check-circle"></i> 4.9 stelle su Google Reviews</li>
+                        </ul>
+
+                        <span class="view-clinic-btn">Scopri San Marco Dental <i class="fas fa-arrow-right"></i></span>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <div class="text-center mt-5">
+            <p style="font-size: 1.1rem; color: var(--off-white);">
+                <i class="fas fa-info-circle"></i> Stiamo ampliando la nostra rete di cliniche partner. Presto altre strutture certificate!
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="section" id="testimonials" style="background: var(--purple-grey);">
+    <div class="container">
+        <h2 class="section-title">Trasformazioni Reali dei Nostri Pazienti</h2>
+        <p class="section-subtitle">Migliaia di italiani hanno già ritrovato il sorriso in Albania</p>
+
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="testimonial-card">
+                    <img src="images/testimonial-1.jpg" alt="Paziente soddisfatto" class="testimonial-image">
+                    <div class="testimonial-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="testimonial-card">
+                    <img src="images/testimonial-2.jpg" alt="Paziente soddisfatta" class="testimonial-image">
+                    <div class="testimonial-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="testimonial-card">
+                    <img src="images/testimonial-3.jpg" alt="Paziente soddisfatto" class="testimonial-image">
+                    <div class="testimonial-rating">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="text-center mt-5">
+            <a href="#clinics" class="cta-button" style="background: var(--off-white); color: var(--purple-grey);">Richiedi il Tuo Preventivo Gratuito</a>
+        </div>
+    </div>
+</section>
+
+<!-- Tour Guide Section -->
+<section class="section" id="tour" style="background: var(--off-white); padding-bottom: 100px;">
+    <div class="container">
+        <h2 class="section-title">Scopri Tirana Durante il Tuo Soggiorno</h2>
+        <p class="section-subtitle">Cure dentali + vacanza: approfitta del tempo tra gli appuntamenti per esplorare la capitale albanese</p>
+
+        <!-- Carousel -->
+        <div id="tourCarousel" class="carousel slide tour-carousel" data-bs-ride="carousel">
+            <div class="carousel-indicators">
+                <button type="button" data-bs-target="#tourCarousel" data-bs-slide-to="0" class="active"></button>
+                <button type="button" data-bs-target="#tourCarousel" data-bs-slide-to="1"></button>
+                <button type="button" data-bs-target="#tourCarousel" data-bs-slide-to="2"></button>
+                <button type="button" data-bs-target="#tourCarousel" data-bs-slide-to="3"></button>
+                <button type="button" data-bs-target="#tourCarousel" data-bs-slide-to="4"></button>
+                <button type="button" data-bs-target="#tourCarousel" data-bs-slide-to="5"></button>
+                <button type="button" data-bs-target="#tourCarousel" data-bs-slide-to="6"></button>
+            </div>
+
+            <div class="carousel-inner">
+                <!-- Slide 1: Piazza Skanderbeg -->
+                <div class="carousel-item active">
+                    <div class="tour-card">
+                        <img src="images/tour/Tirana_28.jpg" alt="Piazza Skanderbeg" class="tour-image">
+                        <div class="tour-content">
+                            <h3 class="tour-title">🏛️ Piazza Skanderbeg (Sheshi Skënderbej)</h3>
+                            <p class="tour-description">
+                                Il cuore pulsante di Tirana! Questa grande piazza, dedicata all'eroe nazionale Gjergj Kastrioti Skënderbeu, riunisce gli edifici più importanti della città e racconta, con la sua architettura, le diverse epoche della storia albanese: ottomana, fascista e comunista. Ideale per una passeggiata al tramonto o una foto panoramica della capitale.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 2: Moschea di Et'hem Bey -->
+                <div class="carousel-item">
+                    <div class="tour-card">
+                        <img src="images/tour/Ethem_Bey_mosque,_Tirana_(by_Pudelek).jpg" alt="Moschea di Et'hem Bey" class="tour-image">
+                        <div class="tour-content">
+                            <h3 class="tour-title">🕌 Moschea di Et'hem Bey (Xhamia e Et'hem Beut)</h3>
+                            <p class="tour-description">
+                                Un gioiello dell'arte ottomana del XIX secolo, situato proprio accanto alla piazza principale. Sopravvissuta al periodo comunista, la moschea colpisce per i suoi affreschi delicati e la sua atmosfera serena. Un simbolo di fede e resilienza nel cuore moderno di Tirana.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 3: Torre dell'Orologio -->
+                <div class="carousel-item">
+                    <div class="tour-card">
+                        <img src="images/tour/Torre_del_Reloj,_Tirana,_Albania,_2014-04-17,_DD_08.jpeg" alt="Torre dell'Orologio" class="tour-image">
+                        <div class="tour-content">
+                            <h3 class="tour-title">🕰️ Torre dell'Orologio (Kulla e Sahatit)</h3>
+                            <p class="tour-description">
+                                Costruita nel 1822, la torre dell'orologio è uno dei simboli storici più amati della città. Salendo i suoi gradini si gode una splendida vista sulla piazza Skanderbeg e sul panorama urbano. Un piccolo viaggio nel tempo, nel vero senso della parola!
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 4: Castello di Tirana -->
+                <div class="carousel-item">
+                    <div class="tour-card">
+                        <img src="images/tour/kalaja-e-tiranes.jpg" alt="Castello di Tirana" class="tour-image">
+                        <div class="tour-content">
+                            <h3 class="tour-title">🏰 Castello di Tirana (Kalaja e Tiranës)</h3>
+                            <p class="tour-description">
+                                Risalente all'epoca bizantina, il Castello di Tirana è oggi un affascinante spazio dove passato e presente si incontrano. Tra le antiche mura troverai caffè, botteghe artigiane e angoli perfetti per rilassarti. Un luogo che racchiude l'anima storica e conviviale della città.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 5: Casa delle Foglie -->
+                <div class="carousel-item">
+                    <div class="tour-card">
+                        <img src="images/tour/thumbs_b_c_bd1915f499f554f01c69867c149724b7.jpg" alt="Casa delle Foglie" class="tour-image">
+                        <div class="tour-content">
+                            <h3 class="tour-title">🕵️‍♂️ Casa delle Foglie (Muzeu i Përgjimeve – Shtëpia me Gjethe)</h3>
+                            <p class="tour-description">
+                                Un museo unico, dedicato al periodo della dittatura comunista e alle attività dei servizi segreti albanesi (Sigurimi). Le stanze e le installazioni raccontano storie di sorveglianza e resistenza. Un'esperienza intensa e toccante che aiuta a comprendere la memoria recente del Paese.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 6: Bunk'Art 2 -->
+                <div class="carousel-item">
+                    <div class="tour-card">
+                        <img src="images/tour/la-splendida-cupola-ingresso.jpg" alt="Bunk'Art 2" class="tour-image">
+                        <div class="tour-content">
+                            <h3 class="tour-title">🧱 Bunk'Art 2 (Il bunker del centro)</h3>
+                            <p class="tour-description">
+                                Situato proprio accanto alla piazza Skanderbeg, questo ex rifugio antiatomico del regime di Enver Hoxha è oggi un museo sotterraneo dedicato alla storia del comunismo e alla polizia di Stato. Tunnel, stanze segrete e installazioni multimediali ti faranno rivivere una parte importante (e inquietante) della storia albanese recente.<br>
+                                <strong>👉 Un viaggio nel sottosuolo della memoria.</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Slide 7: Piramide di Tirana -->
+                <div class="carousel-item">
+                    <div class="tour-card">
+                        <img src="images/tour/MVRDV Pyramid of Tirana 27 © Ossip van Duivenbode.jpg" alt="Piramide di Tirana" class="tour-image">
+                        <div class="tour-content">
+                            <h3 class="tour-title">🔺 Piramide di Tirana (Piramida e Tiranës)</h3>
+                            <p class="tour-description">
+                                Costruita nel 1988 come museo dedicato al dittatore Enver Hoxha, la Piramide è diventata nel tempo uno dei simboli più iconici e controversi della città. Oggi è stata trasformata in un centro culturale e giovanile, con caffè, spazi creativi e una terrazza panoramica.<br>
+                                <strong>👉 Da monumento al potere a simbolo di rinascita e innovazione.</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Controls -->
+            <button class="carousel-control-prev" type="button" data-bs-target="#tourCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#tourCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="section about-section" id="about">
+    <div class="container">
+        <h2 class="section-title">Chi Siamo</h2>
+        <p class="section-subtitle">La tua guida affidabile per il turismo dentale in Albania</p>
+
+        <div class="row mb-5">
+            <div class="col-lg-8 mx-auto">
+                <div class="feature-card" style="text-align: left; background: #261F56;">
+                    <p class="feature-description" style="font-size: 1.1rem; line-height: 1.8; color: #F7F7F8;">
+                        <strong style="color: #F7F7F8;">Clinica Dentale Albania</strong> è il portale leader per il turismo dentale dall'Italia verso l'Albania.
+                        Collaboriamo esclusivamente con cliniche certificate, moderne e specializzate nell'accoglienza di pazienti internazionali.
+                        <br><br>
+                        La nostra missione è rendere accessibili cure dentali di altissima qualità a prezzi equi, garantendo trasparenza,
+                        sicurezza e assistenza completa in ogni fase del percorso.
+                        <br><br>
+                        Ogni anno aiutiamo migliaia di italiani a ritrovare il sorriso, risparmiando fino al 75% rispetto ai costi in Italia,
+                        senza compromessi sulla qualità.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <span class="stat-number">3500+</span>
+                    <span class="stat-label">Pazienti Italiani all'Anno</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <span class="stat-number">75%</span>
+                    <span class="stat-label">Risparmio Medio</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <span class="stat-number">4.9</span>
+                    <span class="stat-label">Rating Medio Google</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stats-card">
+                    <span class="stat-number">100%</span>
+                    <span class="stat-label">Garanzia Soddisfatti</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Final Section -->
+<section class="section" style="background: var(--purple-grey); color: var(--white);">
+    <div class="container text-center">
+        <h2 class="section-title" style="color: var(--white);">Pronto a Trasformare il Tuo Sorriso?</h2>
+        <p class="section-subtitle" style="color: rgba(255,255,255,0.9);">Richiedi un preventivo gratuito e scopri quanto puoi risparmiare</p>
+
+        <div class="row justify-content-center mb-4">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <i class="fas fa-file-invoice feature-icon"></i>
+                    <h3 class="feature-title">1. Preventivo Gratuito</h3>
+                    <p class="feature-description">Inviaci le tue radiografie per una valutazione professionale</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <i class="fas fa-comments feature-icon"></i>
+                    <h3 class="feature-title">2. Consulenza Personalizzata</h3>
+                    <p class="feature-description">Parlare con i nostri specialisti in italiano</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <i class="fas fa-calendar-check feature-icon"></i>
+                    <h3 class="feature-title">3. Prenota il Viaggio</h3>
+                    <p class="feature-description">Organizziamo tutto: volo, hotel, trasporti</p>
+                </div>
+            </div>
+        </div>
+
+        <a href="index.html#preventivo" class="cta-button">Richiedi Preventivo Gratuito</a>
+
+        <div class="mt-4">
+            <p style="font-size: 1.1rem; opacity: 0.9;">
+                <i class="fas fa-phone"></i> Oppure chiamaci: <strong>+355 69 787 0885</strong>
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4">
+                <h4 class="footer-title">Clinica Dentale Albania</h4>
+                <p style="color: var(--gray-2); line-height: 1.6;">
+                    Il tuo partner affidabile per cure dentali di qualità in Albania.
+                    Risparmio garantito senza compromessi sulla sicurezza.
+                </p>
+            </div>
+            <div class="col-md-4">
+                <h4 class="footer-title">Link Utili</h4>
+                <a href="#home" class="footer-link">Home</a>
+                <a href="index.html" class="footer-link">San Marco Dental</a>
+                <a href="#about" class="footer-link">Chi Siamo</a>
+                <a href="#tour" class="footer-link">Guida Turistica</a>
+                <a href="#testimonials" class="footer-link">Testimonianze</a>
+            </div>
+            <div class="col-md-4">
+                <h4 class="footer-title">Contatti</h4>
+                <p style="color: var(--gray-2);">
+                    <i class="fas fa-phone"></i> +355 69 787 0885<br>
+                    <i class="fas fa-envelope"></i> info@clinicadentalealbania.it<br>
+                    <i class="fas fa-map-marker-alt"></i> Tirana, Albania
+                </p>
+                <div class="mt-3">
+                    <a href="https://www.facebook.com/profile.php?id=61579720681623" target="_blank" style="color: var(--white); font-size: 1.5rem; margin-right: 16px;">
+                        <i class="fab fa-facebook"></i>
+                    </a>
+                    <a href="https://www.instagram.com/clinicadentalealbania" target="_blank" style="color: var(--white); font-size: 1.5rem;">
+                        <i class="fab fa-instagram"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+        <hr style="border-color: var(--gray-1); margin: 40px 0 20px 0;">
+        <div class="text-center" style="color: var(--gray-2); font-size: 0.9rem;">
+            <p>&copy; 2025 KLDA Technologies OÜ. Tutti i diritti riservati.</p>
+            <p style="font-size: 0.85rem;">
+                <a href="privacy-policy.html" class="footer-link" style="display: inline; padding: 0 8px;">Privacy Policy</a> |
+                <a href="terms-conditions.html" class="footer-link" style="display: inline; padding: 0 8px;">Termini e Condizioni</a>
+            </p>
+        </div>
+    </div>
+</footer>
+
+<!-- WhatsApp Float Button -->
+<a href="https://wa.me/355697870885" class="whatsapp-float" target="_blank">
+    <i class="fab fa-whatsapp"></i>
+</a>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Smooth scrolling for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function (e) {
+            e.preventDefault();
+            const target = document.querySelector(this.getAttribute('href'));
+            if (target) {
+                target.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        });
+    });
+
+    // Add animation on scroll
+    const observerOptions = {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver(function(entries) {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.feature-card, .clinic-card, .testimonial-card, .tour-card').forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(20px)';
+        el.style.transition = 'all 0.6s ease-out';
+        observer.observe(el);
+    });
+</script>
+
+</body>
+</html>
