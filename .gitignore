@@ -1,0 +1,40 @@
+# KLDA FinTech - Git Ignore Rules
+
+## EA Source Code (Private)
+*.mq5
+
+## Compiled files
+*.ex5
+*.mqh
+
+## Logs
+*.log
+*.txt
+compile_log.txt
+
+## MT5 Files
+*.tpl
+*.chr
+*.set
+
+## Batch Scripts
+compile_*.bat
+
+## Windows
+Thumbs.db
+Desktop.ini
+
+## Editors
+.vscode/
+.idea/
+
+## Temp
+*.tmp
+*.bak
+
+## Keep documentation
+!README.md
+!PROJECT_THEORY.md
+!strategy/*.md
+!docs/*.md
+!reports/*.html
