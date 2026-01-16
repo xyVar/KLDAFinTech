@@ -1,0 +1,194 @@
+{
+  "ticks": [
+    {
+      "ask": 256.58,
+      "bid": 256.56,
+      "buy_volume": 0,
+      "last_updated": "2026-01-16 19:45:04.383+01",
+      "seconds_ago": -7182.981474,
+      "sell_volume": 0,
+      "spread": 2.0,
+      "symbol": "AAPL",
+      "volume": 0
+    },
+    {
+      "ask": 232.33,
+      "bid": 232.25,
+      "buy_volume": 0,
+      "last_updated": "2026-01-16 19:45:03.879+01",
+      "seconds_ago": -7182.477474,
+      "sell_volume": 0,
+      "spread": 8.0,
+      "symbol": "AMD",
+      "volume": 0
+    },
+    {
+      "ask": 238.19,
+      "bid": 238.1,
+      "buy_volume": 0,
+      "last_updated": "2026-01-16 19:45:04.095+01",
+      "seconds_ago": -7182.693474,
+      "sell_volume": 0,
+      "spread": 9.0,
+      "symbol": "AMZN",
+      "volume": 0
+    },
+    {
+      "ask": 347.65,
+      "bid": 347.4,
+      "buy_volume": 0,
+      "last_updated": "2026-01-16 19:45:02.584+01",
+      "seconds_ago": -7181.182474,
+      "sell_volume": 0,
+      "spread": 25.0,
+      "symbol": "AVGO",
+      "volume": 0
+    },
+    {
+      "ask": 75.25,
+      "bid": 75.24,
+      "buy_volume": 0,
+      "last_updated": "2026-01-16 19:44:55.985+01",
+      "seconds_ago": -7174.583474,
+      "sell_volume": 0,
+      "spread": 1.0,
+      "symbol": "CSCO",
+      "volume": 0
+    },
+    {
+      "ask": 331.12,
+      "bid": 331.01,
+      "buy_volume": 0,
+      "last_updated": "2026-01-16 19:45:03.592+01",
+      "seconds_ago": -7182.190474,
+      "sell_volume": 0,
+      "spread": 11.0,
+      "symbol": "GOOG",
+      "volume": 0
+    },
+    {
+      "ask": 47.02,
+      "bid": 47.0,
+      "buy_volume": 0,
+      "last_updated": "2026-01-16 19:45:02.671+01",
+      "seconds_ago": -7181.269474,
+      "sell_volume": 0,
+      "spread": 2.0,
+      "symbol": "INTC",
+      "volume": 0
+    },
+    {
+      "ask": 624.71,
+      "bid": 624.23,
+      "buy_volume": 0,
+      "last_updated": "2026-01-16 19:45:00.714+01",
+      "seconds_ago": -7179.312474,
+      "sell_volume": 0,
+      "spread": 48.0,
+      "symbol": "META",
+      "volume": 0
+    },
+    {
+      "ask": 461.18,
+      "bid": 461.0,
+      "buy_volume": 0,
+      "last_updated": "2026-01-16 19:45:03.219+01",
+      "seconds_ago": -7181.817474,
+      "sell_volume": 0,
+      "spread": 18.0,
+      "symbol": "MSFT",
+      "volume": 0
+    },
+    {
+      "ask": 25577.0,
+      "bid": 25576.0,
+      "buy_volume": 0,
+      "last_updated": "2026-01-16 19:45:04.782+01",
+      "seconds_ago": -7183.380474,
+      "sell_volume": 0,
+      "spread": 10.0,
+      "symbol": "NAS100",
+      "volume": 0
+    },
+    {
+      "ask": 3.233,
+      "bid": 3.229,
+      "buy_volume": 0,
+      "last_updated": "2026-01-16 19:44:57.238+01",
+      "seconds_ago": -7175.836474,
+      "sell_volume": 0,
+      "spread": 4.0,
+      "symbol": "NatGas",
+      "volume": 0
+    },
+    {
+      "ask": 187.75,
+      "bid": 187.74,
+      "buy_volume": 0,
+      "last_updated": "2026-01-16 19:45:04.609+01",
+      "seconds_ago": -7183.207474,
+      "sell_volume": 0,
+      "spread": 1.0,
+      "symbol": "NVDA",
+      "volume": 0
+    },
+    {
+      "ask": 189.2,
+      "bid": 189.07,
+      "buy_volume": 0,
+      "last_updated": "2026-01-16 19:45:00.902+01",
+      "seconds_ago": -7179.500474,
+      "sell_volume": 0,
+      "spread": 13.0,
+      "symbol": "ORCL",
+      "volume": 0
+    },
+    {
+      "ask": 174.48,
+      "bid": 174.43,
+      "buy_volume": 0,
+      "last_updated": "2026-01-16 19:45:04.66+01",
+      "seconds_ago": -7183.258474,
+      "sell_volume": 0,
+      "spread": 5.0,
+      "symbol": "PLTR",
+      "volume": 0
+    },
+    {
+      "ask": 59.89,
+      "bid": 59.86,
+      "buy_volume": 0,
+      "last_updated": "2026-01-16 19:45:04.852+01",
+      "seconds_ago": -7183.450474,
+      "sell_volume": 0,
+      "spread": 30.0,
+      "symbol": "SpotCrude",
+      "volume": 0
+    },
+    {
+      "ask": 439.07,
+      "bid": 438.93,
+      "buy_volume": 0,
+      "last_updated": "2026-01-16 19:45:03.589+01",
+      "seconds_ago": -7182.187474,
+      "sell_volume": 0,
+      "spread": 14.0,
+      "symbol": "TSLA",
+      "volume": 0
+    },
+    {
+      "ask": 16.18,
+      "bid": 16.02,
+      "buy_volume": 0,
+      "last_updated": "2026-01-16 19:44:27.027+01",
+      "seconds_ago": -7145.625474,
+      "sell_volume": 0,
+      "spread": 16.0,
+      "symbol": "VIX",
+      "volume": 0
+    }
+  ],
+  "timestamp": 1768581909,
+  "total_assets": 17,
+  "update_count": 4032
+}

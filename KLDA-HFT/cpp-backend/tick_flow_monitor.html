@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KLDA-HFT Tick Flow Monitor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #0a0e27;
+            color: #00ff00;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 20px;
+            border: 2px solid #00ff00;
+            margin-bottom: 20px;
+            border-radius: 10px;
+        }
+
+        .header h1 {
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .asset-card {
+            background: rgba(20, 30, 60, 0.8);
+            border: 2px solid #4ecdc4;
+            border-radius: 8px;
+            padding: 15px;
+            position: relative;
+        }
+
+        .asset-card.live {
+            border-color: #00ff00;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
+        }
+
+        .asset-card.stale {
+            border-color: #ff4444;
+            opacity: 0.6;
+        }
+
+        .asset-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #4ecdc4;
+        }
+
+        .symbol {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #4ecdc4;
+        }
+
+        .status {
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 0.8em;
+        }
+
+        .status.live {
+            background: #00ff00;
+            color: #0a0e27;
+        }
+
+        .status.stale {
+            background: #ff4444;
+            color: white;
+        }
+
+        .tick-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .stat-box {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 8px;
+            border-radius: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.8em;
+            color: #888;
+            margin-bottom: 3px;
+        }
+
+        .stat-value {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .ticks-per-sec {
+            color: #ffd93d;
+        }
+
+        .total-ticks {
+            color: #4ecdc4;
+        }
+
+        .last-update {
+            color: #00ff00;
+        }
+
+        .price-info {
+            color: #ff6b6b;
+        }
+
+        .history {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #4ecdc4;
+        }
+
+        .history-label {
+            font-size: 0.9em;
+            color: #888;
+            margin-bottom: 5px;
+        }
+
+        .tick-list {
+            max-height: 100px;
+            overflow-y: auto;
+            font-size: 0.8em;
+            line-height: 1.4;
+        }
+
+        .tick-item {
+            padding: 2px 0;
+            border-bottom: 1px solid rgba(78, 205, 196, 0.2);
+        }
+
+        .tick-time {
+            color: #888;
+        }
+
+        .tick-price {
+            color: #00ff00;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⚡ KLDA-HFT TICK FLOW MONITOR</h1>
+        <div id="systemStatus">🔴 DISCONNECTED</div>
+        <div>Last System Update: <span id="lastUpdate">--</span></div>
+    </div>
+
+    <div class="stats-grid" id="statsGrid"></div>
+
+    <script>
+        // Track tick counts for each symbol
+        const tickCounters = {};
+        const tickHistory = {};
+        const lastPrices = {};
+
+        // Initialize counters
+        function initializeSymbol(symbol) {
+            if (!tickCounters[symbol]) {
+                tickCounters[symbol] = {
+                    total: 0,
+                    lastTotal: 0,
+                    ticksPerSecond: 0,
+                    lastUpdateTime: null
+                };
+                tickHistory[symbol] = [];
+            }
+        }
+
+        // Update tick statistics
+        function updateTickStats(symbol, currentTotal, lastUpdated) {
+            initializeSymbol(symbol);
+
+            const counter = tickCounters[symbol];
+            const ticksSinceLastCheck = currentTotal - counter.lastTotal;
+
+            if (ticksSinceLastCheck > 0) {
+                counter.ticksPerSecond = ticksSinceLastCheck;
+                counter.lastTotal = currentTotal;
+                counter.total = currentTotal;
+
+                // Add to history
+                const now = new Date().toLocaleTimeString();
+                tickHistory[symbol].unshift({
+                    time: now,
+                    ticks: ticksSinceLastCheck
+                });
+
+                // Keep only last 10 entries
+                if (tickHistory[symbol].length > 10) {
+                    tickHistory[symbol] = tickHistory[symbol].slice(0, 10);
+                }
+            } else {
+                // No new ticks this interval
+                counter.ticksPerSecond = 0;
+            }
+        }
+
+        // Render the dashboard
+        function renderDashboard(data) {
+            const grid = document.getElementById('statsGrid');
+
+            grid.innerHTML = data.ticks.map(tick => {
+                initializeSymbol(tick.symbol);
+                updateTickStats(tick.symbol, tick.volume, tick.last_updated);
+
+                const counter = tickCounters[tick.symbol];
+                const isLive = tick.seconds_ago < 5;
+                const statusClass = isLive ? 'live' : 'stale';
+                const statusText = isLive ? '🟢 LIVE' : '🔴 STALE';
+
+                return `
+                    <div class="asset-card ${statusClass}">
+                        <div class="asset-header">
+                            <div class="symbol">${tick.symbol}</div>
+                            <div class="status ${statusClass}">${statusText}</div>
+                        </div>
+
+                        <div class="tick-stats">
+                            <div class="stat-box">
+                                <div class="stat-label">TICKS/SEC</div>
+                                <div class="stat-value ticks-per-sec">${counter.ticksPerSecond}</div>
+                            </div>
+
+                            <div class="stat-box">
+                                <div class="stat-label">TOTAL TICKS</div>
+                                <div class="stat-value total-ticks">${counter.total}</div>
+                            </div>
+
+                            <div class="stat-box">
+                                <div class="stat-label">BID / ASK</div>
+                                <div class="stat-value price-info">${tick.bid.toFixed(2)} / ${tick.ask.toFixed(2)}</div>
+                            </div>
+
+                            <div class="stat-box">
+                                <div class="stat-label">LAST UPDATE</div>
+                                <div class="stat-value last-update">${tick.seconds_ago.toFixed(0)}s ago</div>
+                            </div>
+                        </div>
+
+                        <div class="history">
+                            <div class="history-label">Recent Activity (ticks per second):</div>
+                            <div class="tick-list">
+                                ${tickHistory[tick.symbol].map(h => `
+                                    <div class="tick-item">
+                                        <span class="tick-time">${h.time}</span>:
+                                        <span class="tick-price">${h.ticks} ticks</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            // Update header
+            document.getElementById('systemStatus').innerHTML = '🟢 CONNECTED';
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+        }
+
+        // Fetch live data
+        async function fetchLiveData() {
+            try {
+                const response = await fetch('live_ticks.json?' + Date.now());
+                if (!response.ok) {
+                    throw new Error('Failed to fetch');
+                }
+
+                const data = await response.json();
+                renderDashboard(data);
+            } catch (error) {
+                document.getElementById('systemStatus').innerHTML = '🔴 DISCONNECTED';
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        // Update every 1 second
+        fetchLiveData();
+        setInterval(fetchLiveData, 1000);
+    </script>
+</body>
+</html>

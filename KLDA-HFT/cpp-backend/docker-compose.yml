@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  cpp-backend:
+    build: .
+    container_name: klda-hft-cpp-backend
+    networks:
+      - klda-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - DATABASE_HOST=host.docker.internal
+      - DATABASE_PORT=5432
+      - DATABASE_NAME=KLDA-HFT_Database
+      - DATABASE_USER=postgres
+      - DATABASE_PASSWORD=MyKldaTechnologies2025!
+    ports:
+      - "8081:8081"  # REST API (8080 already used by rateradar-websocket)
+    volumes:
+      - ./logs:/app/logs
+      - .:/app/output
+    restart: unless-stopped
+
+networks:
+  klda-network:
+    driver: bridge

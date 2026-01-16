@@ -1,0 +1,40 @@
+{
+  "database": {
+    "host": "localhost",
+    "port": 5432,
+    "name": "KLDA-HFT_Database",
+    "user": "postgres",
+    "password": "MyKldaTechnologies2025!",
+    "connection_pool_size": 10,
+    "connection_timeout": 30
+  },
+
+  "api_server": {
+    "host": "0.0.0.0",
+    "port": 8080,
+    "threads": 4,
+    "enable_cors": true,
+    "jwt_secret": "CHANGE-THIS-SECRET-KEY-IN-PRODUCTION"
+  },
+
+  "analysis": {
+    "order_flow_window_seconds": 300,
+    "spread_window_seconds": 3600,
+    "quote_trade_window_seconds": 900,
+    "signal_threshold": 0.65
+  },
+
+  "assets": [
+    "TSLA", "NVDA", "AAPL", "MSFT", "ORCL",
+    "PLTR", "AMD", "AVGO", "META", "AMZN",
+    "CSCO", "GOOG", "INTC", "VIX", "NAS100",
+    "NATGAS", "SPOTCRUDE"
+  ],
+
+  "logging": {
+    "level": "info",
+    "file": "logs/klda-hft-engine.log",
+    "max_size_mb": 100,
+    "rotate": true
+  }
+}

@@ -1,41 +1,24 @@
-# KLDA FinTech - Algorithmic Trading EA Project
+# KLDA FinTech - Algorithmic Trading Project
 
-> **Automated trading strategies for MetaTrader 5 - Development, testing, and lessons learned**
+> **MT5 trading strategies - 7 EAs tested, 2 strategies work, lessons learned**
 
 [![Platform](https://img.shields.io/badge/Platform-MetaTrader%205-blue)](https://www.metatrader5.com/)
 [![Language](https://img.shields.io/badge/Language-MQL5-orange)](https://www.mql5.com/)
-[![Status](https://img.shields.io/badge/Status-Active%20Development-green)](https://github.com)
+[![Status](https://img.shields.io/badge/Status-Active-green)](https://github.com)
 
 ---
 
 ## 📊 Project Overview
 
-Development of automated Expert Advisors (EAs) for day trading US stock CFDs on MetaTrader 5. This repository documents the complete journey from complex state machines to simple trend-following strategies.
+Systematic development and testing of trading strategies for 8 US stocks (NVDA, PLTR, META, TSLA, ORCL, AMD, BA, AVGO).
 
-**Initial Goal:** €40 daily profit per stock using hedging strategies
-**Actual Result:** €1,170 over 2 years (failed)
-**Recommendation:** Trend following strategy (+100-150% expected)
+**Journey:**
+- Tested 7 different Expert Advisors
+- Found 2 working strategies
+- Discovered why complexity fails
+- Built event-driven TSMC system
 
----
-
-## 🎯 Quick Start
-
-### Prerequisites
-- MetaTrader 5 installed
-- Demo or live trading account (Pepperstone recommended)
-- Basic understanding of MQL5
-
-### Installation
-```bash
-# Clone repository
-git clone https://github.com/yourusername/KLDAFinTech.git
-
-# Copy EA to MT5 directory
-copy "Simple_Daily40_EA.mq5" "C:\Users\PC\AppData\Roaming\MetaQuotes\Terminal\[ID]\MQL5\Experts\"
-
-# Compile in MetaEditor (F7)
-# Run backtest in Strategy Tester (Ctrl+R)
-```
+**Key Discovery:** Manual trading beats automated EAs (€637 in 3 months vs €1,170 in 2 years)
 
 ---
 
@@ -43,183 +26,280 @@ copy "Simple_Daily40_EA.mq5" "C:\Users\PC\AppData\Roaming\MetaQuotes\Terminal\[I
 
 ```
 KLDAFinTech/
-├── README.md                          # This file
-├── PROJECT_THEORY.md                  # ⭐ Complete documentation (50+ pages)
-├── .gitignore                         # Git ignore rules
 │
-├── strategy/                          # Strategy documentation
-│   ├── WINNING_STRATEGY_CONCEPT.md   # ⭐ Recommended: Trend following
-│   ├── SIMPLE_EA_TEST_GUIDE.md       # Simple EA test results & analysis
-│   ├── HEDGED_GRID_SCENARIO_ANALYSIS.md
-│   ├── PROBABILITY_PATH_REASONING.md
-│   ├── DYNAMIC_SCALPING_RESULTS_ANALYSIS.md
-│   └── FINAL_EA_COMPARISON.md
+├── README.md                              ⭐ You are here
+├── PROJECT_THEORY.md                      ⭐ 50+ pages complete analysis
+├── YOUR_MANUAL_STRATEGY_DOCUMENTED.md     ⭐ Proven €637 manual strategy
+├── BROKER_COSTS_AND_STRATEGY_RULES.md     Trading costs & execution rules
+├── .gitignore
 │
-├── docs/                              # Additional documentation
-│   └── HEDGED_GRID_STATUS.md
+├── tsmc_system/                           🎯 TSMC Event-Driven Trading
+│   ├── TSMC_WATCHDOG_SYSTEM.md            (Main system - 4 strategies)
+│   ├── TSMC_EVENT_ANALYSIS_12_QUARTERS.md (100% earnings beat rate)
+│   ├── TSMC_SETUP_GUIDE.md                (Quick start guide)
+│   ├── tsmc_watchdog.py                   (Automated monitoring)
+│   ├── run_tsmc_watchdog.bat              (One-click launcher)
+│   └── TSMC_Daily_Tracker_Template.txt    (Excel template)
 │
-└── reports/                           # Backtest reports
-    └── ReportTester-62101051.html    # Simple EA backtest (2024-2025)
+├── active_strategies/                     ✅ Working Strategies Only
+│   ├── manual_martingale/                 (€637 in 3 months - YOUR strategy)
+│   │   ├── README.md
+│   │   ├── GRID_MARTINGALE_STRATEGY.md
+│   │   └── [Strategy files]
+│   │
+│   └── trend_following_ea/                (€2,028 in 2 years - Automated)
+│       ├── README.md
+│       ├── TrendFollowing_MA50_EA_v2.mq5
+│       └── [Backtest reports]
+│
+├── trackers/                              📊 Excel Trackers (To be created)
+│   ├── TSMC_Daily_Tracker.xlsx            (Template in tsmc_system/)
+│   └── Portfolio_Tracker.xlsx             (To be created)
+│
+├── config/                                ⚙️ Configuration
+│   └── demo_account.env                   (Pepperstone credentials)
+│
+├── archive/                               📦 Old/Failed Work (Preserved)
+│   ├── failed_eas/                        (5 failed EA strategies)
+│   ├── old_strategy_docs/                 (Historical documentation)
+│   ├── analysis_tools/                    (VIX analyzers, etc.)
+│   └── [Other archived material]
+│
+└── .git/                                  📋 Version Control
 ```
-
-**Note:** EA source files (.mq5) are in MT5 directory, not included in Git repo for security.
 
 ---
 
-## 📈 Strategies Tested
+## 🎯 Quick Start
 
-### 1. ❌ Hedged Grid Trading (Abandoned)
-- **Lines:** 930 lines
-- **Approach:** 7-state machine with pending orders
-- **Result:** Never tested (too complex)
-- **Issue:** Mathematical proof shows equal hedging locks P&L
+### Option 1: Use Working Manual Strategy (Recommended)
 
-### 2. ❌ Probability-Based Optimization (Abandoned)
-- **Lines:** 650 lines
-- **Approach:** Gaussian + Markov chain optimization
-- **Result:** Theoretical only
-- **Issue:** Overfitting, unnecessary complexity
+**Your Proven Strategy (€637 in 3 months):**
+```
+1. Read: YOUR_MANUAL_STRATEGY_DOCUMENTED.md
+2. Apply to ORCL or similar range-bound stocks
+3. Method: Buy -4% dips, SELL hedge at +30%, close SELL at €160 profit
+4. Expected: +55% per 3-month cycle
+```
 
-### 3. ❌ Simple Daily €40 Target (Failed)
-- **Lines:** 180 lines
-- **Approach:** BUY → Hedge at -€40 → Target +€40
-- **Result:** €1,170 profit over 2 years (+11.7%)
-- **Issue:** Hedging trap, missed trends
+### Option 2: Use TSMC Event-Driven System
 
-### 4. ⭐ Trend Following (Recommended)
-- **Lines:** ~50 lines (planned)
-- **Approach:** Buy when price > MA50, sell when < MA50
-- **Expected:** €10,000-15,000 over 2 years (+100-150%)
-- **Status:** Proven concept, ready to implement
+**Automated Monitoring + Event Trading:**
+```bash
+# Navigate to tsmc_system folder
+cd tsmc_system
+
+# Run daily monitor (double-click)
+run_tsmc_watchdog.bat
+
+# Read setup guide
+TSMC_SETUP_GUIDE.md
+```
+
+**Expected:** +192% annual on TSMC trades
+
+### Option 3: Use TrendFollowing EA (Automated)
+
+**Simple MA50 Crossover:**
+```
+1. Go to: active_strategies/trend_following_ea/
+2. Copy TrendFollowing_MA50_EA_v2.mq5 to MT5
+3. Backtest: €10k → €12k in 2 years (+20%)
+4. Expected: 10%/year steady returns
+```
+
+---
+
+## 📈 Strategies Summary
+
+### ✅ Working Strategies
+
+| Strategy | Type | Return | Time | Status |
+|----------|------|--------|------|--------|
+| **Manual Martingale** | Manual | +€637 (+55%) | 3 months | ⭐ **BEST** |
+| **TrendFollowing EA** | Automated | +€2,028 (+20%) | 2 years | ✅ Works |
+| **TSMC System** | Event-driven | +192% (expected) | Annual | 🆕 New |
+
+### ❌ Failed Strategies (Archived)
+
+| Strategy | Result | Issue |
+|----------|--------|-------|
+| HedgedGrid EA | Abandoned | Too complex (930 lines) |
+| Optimized EA | Never tested | Overfitting |
+| Simple Daily40 EA | €1,170 (+11.7%) | Hedging trap |
+| BuyOnly Grid EA | €337 (+3.4%) | Poor performance |
+| DynamicScalping EA | €316 (+3.2%) | Failed |
+
+**All failed EAs preserved in `archive/failed_eas/` for reference**
 
 ---
 
 ## 🔬 Key Discoveries
 
-### Discovery 1: The Hedging Trap 🚨
+### 1. The Hedging Trap 🚨
 
-**Mathematical proof that equal-size hedging locks profit/loss:**
+**Mathematical proof:** Equal-size hedging locks P&L regardless of price
 
 ```
 BUY @ $127.00 (20 lots)
 SELL @ $126.80 (20 lots)
 
 Net P&L = ($P - $127) × 2000 + ($126.80 - $P) × 2000
-        = -€400 (constant!)
+        = -€400 (CONSTANT - price cancels out!)
 ```
 
-**Price (P) cancels out! Net is LOCKED regardless of price movement!**
+📖 Full proof: [PROJECT_THEORY.md](PROJECT_THEORY.md)
 
-📖 **Full proof:** See [PROJECT_THEORY.md](PROJECT_THEORY.md#proof-1-equal-hedging-locks-pl)
+### 2. Manual > Automated
 
-### Discovery 2: Trends Beat Targets
+| Approach | Return | Reason |
+|----------|--------|--------|
+| Your Manual Strategy | +55% (3 months) | Adapts to market changes |
+| Best Automated EA | +20% (2 years) | Rigid rules, can't adapt |
 
-| Strategy | Trades | Profit | Return |
-|----------|--------|--------|--------|
-| Daily €40 Hedge | 500+ | €1,170 | +11.7% |
-| Buy & Hold (ORCL) | 1 | €3,600+ | +36% |
-| Trend Following (est) | 8 | €10,000+ | +100% |
+**Insight:** Use automation for monitoring, manual for execution
 
-**One trend > 500 small targets!**
-
-### Discovery 3: Complexity Kills Performance
+### 3. Complexity Kills Performance
 
 | Lines of Code | Result |
 |---------------|--------|
 | 930 | Never worked |
 | 650 | Never tested |
-| 180 | €1,170 (failed) |
-| 50 | €10,000+ (predicted) |
+| 180 | Failed (€1,170) |
+| 50 | Success (€2,028) |
 
-**Simpler = Better!**
-
----
-
-## 📊 Test Results
-
-### Simple Daily €40 EA - Backtest
-
-**Configuration:**
-- Symbol: ORCL.US-24
-- Period: M5 (5-minute bars)
-- Dates: 2024.01.01 - 2025.12.25 (2 years)
-- Initial Deposit: €10,000
-- Leverage: 1:5
-
-**Results:**
-```
-Total Net Profit: €1,170
-Return: +11.7% (over 2 years)
-Annual Return: ~5.8%
-Total Trades: ~500-800
-Win Rate: ~55%
-Verdict: FAILED ❌
-```
-
-**Why it failed:**
-1. Hedging trap locks positions at -€40
-2. €40 target exits too early, misses big moves
-3. ORCL had larger trends (missed +30% move)
-4. Overtrading (500+ trades)
-5. Commission costs
-
-📊 **Full report:** [reports/ReportTester-62101051.html](reports/ReportTester-62101051.html)
+**Simple beats complex every time**
 
 ---
 
-## 🎓 Lessons Learned
+## 🎓 What Works
 
-### Technical
-✅ Test simple concepts before building complexity
-✅ Hedging in MT5 needs careful position tracking
-✅ Commission costs matter for small profits
-✅ Order tickets ≠ Position tickets in hedging mode
+### For Range-Bound Stocks (ORCL, AMD, BA):
+✅ **Manual Martingale Strategy**
+- Buy every -4% dip (max 8 positions)
+- SELL hedge when equity +30%
+- Close SELL at €160 profit
+- Keep LONG running
+- Expected: +55% per cycle
 
-### Strategy
-✅ Match strategy to market (2024 was trending)
-✅ Let winners run, cut losers short
-✅ Hedging is for protection, not profit
-✅ Complexity is the enemy
+### For Trending Stocks (NVDA, PLTR, TSLA):
+✅ **TrendFollowing EA**
+- Buy when price > MA50
+- Sell when price < MA50
+- Daily timeframe
+- Expected: +20% annual
 
-### Development
-✅ KISS: Keep It Simple, Stupid
-✅ Test assumptions with data, not theory
-✅ Abandon failures quickly
-✅ Document everything
+### For Event-Driven (TSMC):
+✅ **TSMC Watchdog System**
+- Trade earnings (4x/year)
+- Trade tech symposiums (1x/year)
+- Buy major dips ($280, $250)
+- SELL hedge at peaks + VIX spikes
+- Expected: +192% annual
 
 ---
 
-## 🚀 Next Steps
+## 🚀 Getting Started
 
-### Immediate
-1. ⭐ Build **Trend Following EA** (50 lines)
-2. Test on 2024-2025 data
-3. Verify €10k-15k profit expectation
+### Step 1: Choose Your Approach
 
-### Short-term
-1. Forward test on demo account
-2. Optimize MA period (20, 50, 100)
-3. Test on NVDA, PLTR, META, TSLA
+**If you like manual trading:**
+→ Read `YOUR_MANUAL_STRATEGY_DOCUMENTED.md`
+→ Apply to 1-2 stocks
+→ Track in Excel
 
-### Long-term
-1. Live trading with €1,000 capital
-2. Portfolio approach (trend + mean reversion)
-3. Automated monitoring
-4. Scale to 10+ stocks
+**If you want automation:**
+→ Use `active_strategies/trend_following_ea/`
+→ Deploy on trending stocks
+→ Monitor weekly
+
+**If you want event-driven:**
+→ Go to `tsmc_system/`
+→ Run `run_tsmc_watchdog.bat` daily
+→ Trade on signals
+
+### Step 2: Test First
+
+**Demo account testing:**
+1. Pepperstone demo (already configured in `config/`)
+2. Test for 1-3 months
+3. Verify results match expectations
+
+### Step 3: Scale Up
+
+**Once working:**
+1. Start with €1,000-2,500 per stock
+2. Add more stocks (up to 8)
+3. Track everything in Excel
+4. Target: €50,000 annual profit
 
 ---
 
 ## 📚 Documentation
 
-### Essential Reading
-📖 **[PROJECT_THEORY.md](PROJECT_THEORY.md)** - Complete 50-page documentation
-⭐ **[WINNING_STRATEGY_CONCEPT.md](strategy/WINNING_STRATEGY_CONCEPT.md)** - Recommended approach
-📊 **[SIMPLE_EA_TEST_GUIDE.md](strategy/SIMPLE_EA_TEST_GUIDE.md)** - Test results
+### Must Read (Priority Order)
 
-### Deep Dives
-- **HEDGED_GRID_SCENARIO_ANALYSIS.md** - All 6 grid scenarios
-- **PROBABILITY_PATH_REASONING.md** - Gaussian/Markov approach
-- **FINAL_EA_COMPARISON.md** - Strategy comparison
+1. **[YOUR_MANUAL_STRATEGY_DOCUMENTED.md](YOUR_MANUAL_STRATEGY_DOCUMENTED.md)** ⭐
+   - Your proven €637 strategy
+   - Real trade log
+   - Scaling plan to €50k
+
+2. **[PROJECT_THEORY.md](PROJECT_THEORY.md)** ⭐
+   - Complete 50-page analysis
+   - Why each EA failed
+   - Mathematical proofs
+
+3. **[tsmc_system/TSMC_SETUP_GUIDE.md](tsmc_system/TSMC_SETUP_GUIDE.md)** 🆕
+   - New event-driven system
+   - 15-minute setup
+   - Automated monitoring
+
+4. **[BROKER_COSTS_AND_STRATEGY_RULES.md](BROKER_COSTS_AND_STRATEGY_RULES.md)**
+   - Pepperstone commission structure
+   - BUY/SELL rules for 100% margin deployment
+   - Position sizing calculations
+
+### Archive (Reference Only)
+
+Old strategies and failed attempts preserved in `archive/` folder:
+- Failed EA documentation
+- Analysis tools
+- Historical strategy docs
+
+**Don't start here** - read working strategies first!
+
+---
+
+## 🎯 2026 Goals
+
+**Realistic Target:** €50,000 annual profit
+
+**Portfolio Allocation:**
+```
+Manual Martingale (3 stocks): €7,500 capital → €25,000 profit (333%)
+TrendFollowing EA (3 stocks): €7,500 capital → €2,250 profit (30%)
+TSMC System (1 stock):        €2,500 capital → €4,800 profit (192%)
+VIX Hedges (opportunistic):   -               → €5,000 profit
+
+Total Capital: €17,500
+Total Expected: €37,050 profit (212% return)
+```
+
+**Conservative (50% success):** €18,500 profit (106% return) ✅ Achievable
+
+---
+
+## 📊 Project Stats
+
+| Metric | Value |
+|--------|-------|
+| Strategies Tested | 7 EAs |
+| Working Strategies | 2 |
+| Documentation Pages | 150+ |
+| Test Period | 2 years (backtest) |
+| Best Manual Result | €637 (+55% in 3 months) |
+| Best Automated Result | €2,028 (+20% in 2 years) |
+| **Key Lesson** | **Manual > Automated** |
 
 ---
 
@@ -229,38 +309,26 @@ Verdict: FAILED ❌
 
 - All tests on demo accounts
 - Past performance ≠ future results
-- Trading = risk of loss
+- Trading involves risk of loss
 - Only trade money you can afford to lose
-
-**Market Context:**
-- Backtest: 2024-2025 bull market
-- Results may differ in other conditions
-- Commission costs vary by broker
 
 ---
 
 ## 🤝 Contributing
 
-Personal learning project, but feedback welcome!
+Personal learning project. Feedback welcome!
 
-**Good contributions:**
-- Testing trend following on different stocks
+**Share:**
+- Test results on different stocks
+- Improvements to working strategies
 - Bug reports
-- Simple improvements
-- Backtest results
 
 **Please don't suggest:**
-- Complex math optimizations
-- More hedging strategies
-- State machines
+- More complex EAs
+- Additional hedging strategies
+- Overcomplicated optimizations
 
-Keep it simple!
-
----
-
-## 📝 License
-
-MIT License - Use for learning at your own risk.
+**Keep it simple!**
 
 ---
 
@@ -269,28 +337,26 @@ MIT License - Use for learning at your own risk.
 **Project:** KLDA FinTech
 **Platform:** MetaTrader 5
 **Broker:** Pepperstone Demo
-**Repository:** https://github.com/yourusername/KLDAFinTech
+**Repository:** https://github.com/xyVar/KLDAFinTech
 
 ---
 
-## 🏆 Project Stats
+## 🏆 Quick Win Checklist
 
-| Metric | Value |
-|--------|-------|
-| Strategies Developed | 4 |
-| Lines of Code | 1,760+ |
-| Documentation Pages | 100+ |
-| Test Duration | 2 years (backtest) |
-| Best Result | €1,170 (Simple EA) |
-| Expected (Trend) | €10,000-15,000 |
-| **Key Lesson** | **Simple beats complex** |
+- [ ] Read YOUR_MANUAL_STRATEGY_DOCUMENTED.md
+- [ ] Pick 1-2 stocks to trade manually
+- [ ] Test on demo account (1 month)
+- [ ] Try TSMC watchdog system (run_tsmc_watchdog.bat)
+- [ ] Deploy TrendFollowing EA on trending stocks
+- [ ] Track all trades in Excel
+- [ ] Scale up when profitable
 
 ---
 
-**⭐ Star this repo if you learned from our failures!**
+**⭐ Star this repo if our failures taught you something!**
 
-*"Success is going from failure to failure without losing enthusiasm." - Winston Churchill*
+*"Success is stumbling from failure to failure with no loss of enthusiasm."*
 
 ---
 
-*Last Updated: December 27, 2025 | Version: 1.0 | Status: Active Development*
+*Last Updated: January 9, 2026 | Version: 2.0 | Status: Clean & Organized*

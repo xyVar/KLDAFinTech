@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KLDA-HFT Market Data Terminal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Consolas', 'Courier New', monospace;
+            background: #000000;
+            color: #00ff00;
+            padding: 20px;
+            font-size: 14px;
+        }
+
+        .terminal-header {
+            border: 2px solid #00ff00;
+            padding: 20px;
+            margin-bottom: 20px;
+            background: rgba(0, 20, 0, 0.8);
+        }
+
+        .terminal-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #00ff00;
+            text-align: center;
+        }
+
+        .data-source-info {
+            font-size: 12px;
+            line-height: 1.6;
+            color: #00dd00;
+            margin-top: 10px;
+            border-top: 1px solid #00ff00;
+            padding-top: 10px;
+        }
+
+        .system-status {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #00ff00;
+            font-size: 11px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #00ff00;
+        }
+
+        .status-indicator.stale {
+            background: #ff0000;
+        }
+
+        .market-data-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(0, 20, 0, 0.6);
+            border: 2px solid #00ff00;
+        }
+
+        .market-data-table thead {
+            background: rgba(0, 40, 0, 0.9);
+            border-bottom: 2px solid #00ff00;
+        }
+
+        .market-data-table th {
+            padding: 12px 8px;
+            text-align: left;
+            color: #00ff00;
+            font-weight: bold;
+            border-right: 1px solid #004400;
+            font-size: 12px;
+        }
+
+        .market-data-table th:last-child {
+            border-right: none;
+        }
+
+        .market-data-table td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #003300;
+            border-right: 1px solid #002200;
+            font-size: 13px;
+        }
+
+        .market-data-table td:last-child {
+            border-right: none;
+        }
+
+        .market-data-table tbody tr {
+            transition: background 0.2s;
+        }
+
+        .market-data-table tbody tr:hover {
+            background: rgba(0, 40, 0, 0.8);
+        }
+
+        .market-data-table tbody tr.live {
+            background: rgba(0, 30, 0, 0.4);
+        }
+
+        .market-data-table tbody tr.stale {
+            background: rgba(30, 0, 0, 0.3);
+            opacity: 0.7;
+        }
+
+        .symbol-name {
+            color: #00ffff;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .price-bid {
+            color: #ff6666;
+            font-weight: bold;
+        }
+
+        .price-ask {
+            color: #66ddff;
+            font-weight: bold;
+        }
+
+        .spread-value {
+            color: #ffff66;
+        }
+
+        .volume-value {
+            color: #99ff99;
+        }
+
+        .timestamp {
+            color: #aaaaaa;
+            font-size: 11px;
+        }
+
+        .status-live {
+            color: #00ff00;
+        }
+
+        .status-stale {
+            color: #ff4444;
+        }
+
+        .ticks-per-sec {
+            color: #ffaa00;
+            font-weight: bold;
+        }
+
+        .table-footer {
+            margin-top: 20px;
+            padding: 15px;
+            border: 2px solid #00ff00;
+            background: rgba(0, 20, 0, 0.8);
+            font-size: 11px;
+            line-height: 1.6;
+        }
+
+        .table-footer h3 {
+            color: #00ff00;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        .footer-section {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #004400;
+        }
+
+        .last-update {
+            text-align: right;
+            color: #888888;
+            font-size: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Terminal Header -->
+    <div class="terminal-header">
+        <div class="terminal-title">KLDA-HFT MARKET DATA TERMINAL</div>
+
+        <div class="data-source-info">
+            <strong>DATA SOURCE:</strong> Real-time tick data feed from Pepperstone MT5 broker via direct API connection<br>
+            <strong>UPDATE FREQUENCY:</strong> Live tick-by-tick updates (3-5 ticks per second per instrument)<br>
+            <strong>DATA FLOW:</strong> MT5 Terminal → Python Bridge → PostgreSQL Database → Real-Time Display<br>
+            <strong>ASSET COVERAGE:</strong> 15 US Equities (24h CFD), 1 Volatility Index, 1 Index Future, 2 Energy Commodities
+        </div>
+
+        <div class="system-status">
+            <div class="status-item">
+                <span class="status-indicator" id="dbIndicator"></span>
+                <span>Database: <span id="dbStatus">CONNECTING</span></span>
+            </div>
+            <div class="status-item">
+                <span>Last System Update: <span id="lastSystemUpdate">--:--:--</span></span>
+            </div>
+            <div class="status-item">
+                <span>Total Assets: <span id="totalAssets">0</span></span>
+            </div>
+            <div class="status-item">
+                <span>Live Assets: <span id="liveAssets">0</span></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Market Data Table -->
+    <table class="market-data-table">
+        <thead>
+            <tr>
+                <th style="width: 100px;">SYMBOL</th>
+                <th style="width: 100px;">BID PRICE</th>
+                <th style="width: 100px;">BID VOLUME</th>
+                <th style="width: 100px;">ASK PRICE</th>
+                <th style="width: 100px;">ASK VOLUME</th>
+                <th style="width: 80px;">SPREAD</th>
+                <th style="width: 100px;">TOTAL VOL</th>
+                <th style="width: 80px;">TICKS/SEC</th>
+                <th style="width: 160px;">LAST TICK TIME</th>
+                <th style="width: 70px;">AGE</th>
+                <th style="width: 70px;">STATUS</th>
+            </tr>
+        </thead>
+        <tbody id="marketDataBody">
+            <tr>
+                <td colspan="11" style="text-align: center; padding: 40px;">
+                    Waiting for market data feed...
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Footer Information -->
+    <div class="table-footer">
+        <h3>LEGEND & DATA EXPLANATION</h3>
+
+        <div><strong>BID PRICE:</strong> The highest price a buyer is willing to pay for the instrument (shown in red)</div>
+        <div><strong>BID VOLUME:</strong> Cumulative volume on the sell side (market participants selling at bid)</div>
+        <div><strong>ASK PRICE:</strong> The lowest price a seller is willing to accept for the instrument (shown in cyan)</div>
+        <div><strong>ASK VOLUME:</strong> Cumulative volume on the buy side (market participants buying at ask)</div>
+        <div><strong>SPREAD:</strong> The difference between Ask and Bid in basis points (lower spread = more liquid market)</div>
+        <div><strong>TOTAL VOLUME:</strong> Cumulative tick volume since session start (buy + sell combined)</div>
+        <div><strong>TICKS/SEC:</strong> Number of price updates received per second (higher = more active trading)</div>
+        <div><strong>LAST TICK TIME:</strong> Timestamp of the most recent price update from broker (broker server time)</div>
+        <div><strong>AGE:</strong> Time elapsed since last price update (s=seconds, m=minutes, h=hours)</div>
+        <div><strong>STATUS:</strong> LIVE (price updating within 5 seconds) | STALE (no updates > 5 seconds)</div>
+
+        <div class="footer-section">
+            <strong>MARKET HOURS & AVAILABILITY:</strong><br>
+            • US Equities (CFD): 24-hour trading available via Pepperstone<br>
+            • NAS100 Index: 24-hour trading (futures market)<br>
+            • VIX Index: Limited hours based on CBOE session<br>
+            • Energy Commodities (NatGas, SpotCrude): 24-hour trading (futures market)
+        </div>
+
+        <div class="footer-section">
+            <strong>TECHNICAL NOTES:</strong><br>
+            • All prices are indicative CFD prices from Pepperstone broker<br>
+            • Tick data captured at 100ms intervals and batched every 2 seconds<br>
+            • Database stores complete tick history in TimescaleDB hypertables<br>
+            • Display refresh rate: 1000ms (1 second)
+        </div>
+
+        <div class="last-update">
+            Page loaded: <span id="pageLoadTime"></span> | Auto-refresh: ENABLED
+        </div>
+    </div>
+
+    <script>
+        // Track tick statistics
+        const tickCounters = {};
+        const symbolDescriptions = {
+            'TSLA': 'Tesla Inc',
+            'NVDA': 'NVIDIA Corporation',
+            'PLTR': 'Palantir Technologies',
+            'AMD': 'Advanced Micro Devices',
+            'AVGO': 'Broadcom Inc',
+            'META': 'Meta Platforms Inc',
+            'AAPL': 'Apple Inc',
+            'MSFT': 'Microsoft Corporation',
+            'ORCL': 'Oracle Corporation',
+            'AMZN': 'Amazon.com Inc',
+            'CSCO': 'Cisco Systems Inc',
+            'GOOG': 'Alphabet Inc',
+            'INTC': 'Intel Corporation',
+            'VIX': 'CBOE Volatility Index',
+            'NAS100': 'NASDAQ 100 Index',
+            'NatGas': 'Natural Gas Futures',
+            'SpotCrude': 'WTI Crude Oil Spot'
+        };
+
+        // Initialize counters
+        function initializeSymbol(symbol) {
+            if (!tickCounters[symbol]) {
+                tickCounters[symbol] = {
+                    lastTotal: 0,
+                    ticksPerSecond: 0
+                };
+            }
+        }
+
+        // Update tick statistics
+        function updateTickStats(symbol, currentVolume) {
+            initializeSymbol(symbol);
+            const counter = tickCounters[symbol];
+            const ticksSinceLastCheck = currentVolume - counter.lastTotal;
+
+            if (ticksSinceLastCheck > 0) {
+                counter.ticksPerSecond = ticksSinceLastCheck;
+                counter.lastTotal = currentVolume;
+            } else {
+                counter.ticksPerSecond = 0;
+            }
+        }
+
+        // Format timestamp
+        function formatTimestamp(timestampStr) {
+            try {
+                const date = new Date(timestampStr);
+                return date.toLocaleString('en-GB', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                });
+            } catch {
+                return timestampStr;
+            }
+        }
+
+        // Format age
+        function formatAge(seconds) {
+            if (seconds < 60) {
+                return seconds.toFixed(0) + 's';
+            } else if (seconds < 3600) {
+                return (seconds / 60).toFixed(1) + 'm';
+            } else {
+                return (seconds / 3600).toFixed(1) + 'h';
+            }
+        }
+
+        // Render market data table
+        function renderMarketData(data) {
+            const tbody = document.getElementById('marketDataBody');
+            let liveCount = 0;
+
+            const rows = data.ticks.map(tick => {
+                const symbol = tick.symbol;
+                const isLive = tick.seconds_ago < 5;
+                if (isLive) liveCount++;
+
+                updateTickStats(symbol, tick.volume);
+                const counter = tickCounters[symbol];
+
+                const rowClass = isLive ? 'live' : 'stale';
+                const statusText = isLive ? 'LIVE' : 'STALE';
+                const statusClass = isLive ? 'status-live' : 'status-stale';
+
+                return `
+                    <tr class="${rowClass}">
+                        <td><span class="symbol-name">${symbol}</span><br><small style="color: #666;">${symbolDescriptions[symbol] || ''}</small></td>
+                        <td class="price-bid">${tick.bid.toFixed(2)}</td>
+                        <td class="volume-value">${tick.sell_volume.toLocaleString()}</td>
+                        <td class="price-ask">${tick.ask.toFixed(2)}</td>
+                        <td class="volume-value">${tick.buy_volume.toLocaleString()}</td>
+                        <td class="spread-value">${tick.spread.toFixed(2)}</td>
+                        <td class="volume-value">${tick.volume.toLocaleString()}</td>
+                        <td class="ticks-per-sec">${counter.ticksPerSecond}</td>
+                        <td class="timestamp">${formatTimestamp(tick.last_updated)}</td>
+                        <td>${formatAge(tick.seconds_ago)}</td>
+                        <td class="${statusClass}">${statusText}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            tbody.innerHTML = rows;
+
+            // Update system status
+            document.getElementById('dbStatus').textContent = 'CONNECTED';
+            document.getElementById('dbIndicator').className = 'status-indicator';
+            document.getElementById('lastSystemUpdate').textContent = new Date().toLocaleTimeString('en-GB');
+            document.getElementById('totalAssets').textContent = data.ticks.length;
+            document.getElementById('liveAssets').textContent = liveCount;
+        }
+
+        // Fetch live data
+        async function fetchLiveData() {
+            try {
+                const response = await fetch('live_ticks.json?' + Date.now());
+                if (!response.ok) throw new Error('Failed to fetch');
+
+                const data = await response.json();
+                renderMarketData(data);
+            } catch (error) {
+                document.getElementById('dbStatus').textContent = 'DISCONNECTED';
+                document.getElementById('dbIndicator').className = 'status-indicator stale';
+                console.error('Error fetching data:', error);
+            }
+        }
+
+        // Set page load time
+        document.getElementById('pageLoadTime').textContent = new Date().toLocaleString('en-GB');
+
+        // Start fetching data
+        fetchLiveData();
+        setInterval(fetchLiveData, 1000);
+    </script>
+</body>
+</html>
