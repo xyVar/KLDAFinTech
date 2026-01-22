@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>KLDA-HFT Renaissance Metrics Terminal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000000;
+            color: #00ff00;
+            padding: 10px;
+            font-size: 11px;
+            overflow-x: auto;
+        }
+
+        .header {
+            border: 2px solid #00ff00;
+            padding: 10px;
+            margin-bottom: 10px;
+            background: #001100;
+        }
+
+        .header h1 {
+            font-size: 16px;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .system-status {
+            display: flex;
+            justify-content: space-between;
+            font-size: 10px;
+            border-top: 1px solid #00ff00;
+            padding-top: 5px;
+            margin-top: 5px;
+        }
+
+        .status-connected { color: #00ff00; }
+        .status-disconnected { color: #ff0000; }
+
+        .main-table {
+            width: 100%;
+            border-collapse: collapse;
+            border: 2px solid #00ff00;
+            margin-bottom: 10px;
+        }
+
+        .main-table th {
+            background: #002200;
+            border: 1px solid #00ff00;
+            padding: 6px 4px;
+            text-align: center;
+            font-size: 10px;
+            font-weight: bold;
+        }
+
+        .main-table td {
+            border: 1px solid #003300;
+            padding: 5px 4px;
+            text-align: center;
+            font-size: 10px;
+        }
+
+        .main-table tr.live { background: #001100; }
+        .main-table tr.stale { background: #110000; opacity: 0.5; }
+
+        .symbol { color: #00ffff; font-weight: bold; }
+        .price { color: #ffff00; }
+
+        /* Metric color coding */
+        .metric-signal { color: #00ff00; font-weight: bold; }
+        .metric-neutral { color: #888888; }
+        .metric-nosignal { color: #ff4444; }
+
+        .signal-enter {
+            color: #00ff00;
+            font-weight: bold;
+            background: #003300;
+        }
+
+        .signal-wait {
+            color: #666666;
+        }
+
+        .signal-short {
+            color: #ff00ff;
+            font-weight: bold;
+            background: #330033;
+        }
+
+        /* Metrics explanation panel */
+        .metrics-panel {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .metric-card {
+            border: 1px solid #00ff00;
+            padding: 10px;
+            background: #001100;
+        }
+
+        .metric-card h3 {
+            color: #00ffff;
+            font-size: 12px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #00ff00;
+            padding-bottom: 4px;
+        }
+
+        .metric-card .metric-description {
+            font-size: 9px;
+            line-height: 1.4;
+            color: #00cc00;
+            margin-bottom: 6px;
+        }
+
+        .metric-card .metric-thresholds {
+            font-size: 9px;
+            line-height: 1.3;
+            margin-top: 6px;
+            padding-top: 6px;
+            border-top: 1px solid #003300;
+        }
+
+        .threshold-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 2px 0;
+        }
+
+        .threshold-label { color: #888888; }
+        .threshold-value { color: #00ff00; }
+        .threshold-nosignal { color: #ff4444; }
+
+        .legend {
+            border: 1px solid #00ff00;
+            padding: 8px;
+            background: #001100;
+            font-size: 9px;
+            line-height: 1.4;
+        }
+
+        .legend-title {
+            color: #00ffff;
+            font-weight: bold;
+            margin-bottom: 4px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <h1>RENAISSANCE MEDALLION FUND METRICS - REAL-TIME TICK ANALYSIS</h1>
+        <div class="system-status">
+            <div>DATABASE: <span id="dbStatus" class="status-disconnected">DISCONNECTED</span></div>
+            <div>LAST UPDATE: <span id="lastUpdate">--:--:--</span></div>
+            <div>TOTAL TICKS: <span id="totalTicks">0</span></div>
+            <div>LIVE ASSETS: <span id="liveAssets">0</span></div>
+            <div>ENTRY SIGNALS: <span id="entrySignals">0</span></div>
+        </div>
+    </div>
+
+    <!-- Metrics Explanation Panel -->
+    <div class="metrics-panel">
+        <!-- Metric 1: Mean Reversion -->
+        <div class="metric-card">
+            <h3>1. MEAN REVERSION (Simons)</h3>
+            <div class="metric-description">
+                <strong>MEASURES:</strong> Price distance from 20-tick moving average<br>
+                <strong>THEORY:</strong> Prices deviate, then snap back (rubber band effect)<br>
+                <strong>CALCULATION:</strong> ((Current Price - MA20) / MA20) × 100
+            </div>
+            <div class="metric-thresholds">
+                <div class="threshold-item">
+                    <span class="threshold-label">STRONG BUY:</span>
+                    <span class="threshold-value">-1.5% to -3.0%</span>
+                </div>
+                <div class="threshold-item">
+                    <span class="threshold-label">MILD BUY:</span>
+                    <span class="threshold-value">-0.5% to -1.5%</span>
+                </div>
+                <div class="threshold-item">
+                    <span class="threshold-label">NEUTRAL:</span>
+                    <span class="threshold-nosignal">-0.5% to +0.5%</span>
+                </div>
+                <div class="threshold-item">
+                    <span class="threshold-label">STRONG SELL:</span>
+                    <span class="threshold-value">+1.5% to +3.0%</span>
+                </div>
+                <div style="margin-top: 4px; color: #ffff00; font-size: 8px;">
+                    → WHAT HAPPENS: Price snaps back to MA within 2-10 ticks
+                </div>
+            </div>
+        </div>
+
+        <!-- Metric 2: Order Flow Imbalance -->
+        <div class="metric-card">
+            <h3>2. ORDER FLOW IMBALANCE (Berlekamp)</h3>
+            <div class="metric-description">
+                <strong>MEASURES:</strong> Net buying vs selling pressure (last 100 ticks)<br>
+                <strong>THEORY:</strong> Smart money accumulation before price moves<br>
+                <strong>CALCULATION:</strong> SUM(buy_volume) - SUM(sell_volume)
+            </div>
+            <div class="metric-thresholds">
+                <div class="threshold-item">
+                    <span class="threshold-label">STRONG BUY:</span>
+                    <span class="threshold-value">>+5000 net buying</span>
+                </div>
+                <div class="threshold-item">
+                    <span class="threshold-label">MILD BUY:</span>
+                    <span class="threshold-value">+1000 to +5000</span>
+                </div>
+                <div class="threshold-item">
+                    <span class="threshold-label">BALANCED:</span>
+                    <span class="threshold-nosignal">-1000 to +1000</span>
+                </div>
+                <div class="threshold-item">
+                    <span class="threshold-label">STRONG SELL:</span>
+                    <span class="threshold-value"><-5000 net selling</span>
+                </div>
+                <div style="margin-top: 4px; color: #ffff00; font-size: 8px;">
+                    → WHAT HAPPENS: Price follows smart money within 5-20 ticks
+                </div>
+            </div>
+        </div>
+
+        <!-- Metric 3: Spread Volatility -->
+        <div class="metric-card">
+            <h3>3. SPREAD VOLATILITY (Patterson)</h3>
+            <div class="metric-description">
+                <strong>MEASURES:</strong> Current spread vs 100-tick average<br>
+                <strong>THEORY:</strong> Widening spread = liquidity crisis = opportunity<br>
+                <strong>CALCULATION:</strong> ((Current Spread - Avg Spread) / Avg Spread) × 100
+            </div>
+            <div class="metric-thresholds">
+                <div class="threshold-item">
+                    <span class="threshold-label">EXTREME WIDE:</span>
+                    <span class="threshold-value">>+50% wider</span>
+                </div>
+                <div class="threshold-item">
+                    <span class="threshold-label">WIDE:</span>
+                    <span class="threshold-value">+20% to +50%</span>
+                </div>
+                <div class="threshold-item">
+                    <span class="threshold-label">NORMAL:</span>
+                    <span class="threshold-nosignal">-10% to +20%</span>
+                </div>
+                <div class="threshold-item">
+                    <span class="threshold-label">TIGHT:</span>
+                    <span class="threshold-value"><-10% narrower</span>
+                </div>
+                <div style="margin-top: 4px; color: #ffff00; font-size: 8px;">
+                    → WHAT HAPPENS: Price breakout within 10-30 ticks after widening
+                </div>
+            </div>
+        </div>
+
+        <!-- Metric 4: HMM Regime Detection -->
+        <div class="metric-card">
+            <h3>4. HMM REGIME (Brown)</h3>
+            <div class="metric-description">
+                <strong>MEASURES:</strong> Hidden market state (bullish/bearish/neutral)<br>
+                <strong>THEORY:</strong> Market has invisible states, detect transitions<br>
+                <strong>CALCULATION:</strong> Pattern of last 20 ticks + volatility
+            </div>
+            <div class="metric-thresholds">
+                <div class="threshold-item">
+                    <span class="threshold-label">BULLISH REGIME:</span>
+                    <span class="threshold-value">Uptrend pattern</span>
+                </div>
+                <div class="threshold-item">
+                    <span class="threshold-label">BEARISH REGIME:</span>
+                    <span class="threshold-value">Downtrend pattern</span>
+                </div>
+                <div class="threshold-item">
+                    <span class="threshold-label">NEUTRAL:</span>
+                    <span class="threshold-nosignal">Choppy, no trend</span>
+                </div>
+                <div class="threshold-item">
+                    <span class="threshold-label">TRANSITION:</span>
+                    <span class="threshold-value" style="color: #ff00ff;">Regime changing!</span>
+                </div>
+                <div style="margin-top: 4px; color: #ffff00; font-size: 8px;">
+                    → WHAT HAPPENS: Trend continues 60-80% probability
+                </div>
+            </div>
+        </div>
+
+        <!-- Metric 5: Transaction Cost -->
+        <div class="metric-card">
+            <h3>5. TRANSACTION COST (Mercer)</h3>
+            <div class="metric-description">
+                <strong>MEASURES:</strong> Total cost to execute (spread + swap + commission)<br>
+                <strong>THEORY:</strong> "The Devil" - costs kill edge, only trade if edge > cost<br>
+                <strong>CALCULATION:</strong> Spread + (Position × Swap Rate) + Commission
+            </div>
+            <div class="metric-thresholds">
+                <div class="threshold-item">
+                    <span class="threshold-label">LOW COST:</span>
+                    <span class="threshold-value"><€5 per trade</span>
+                </div>
+                <div class="threshold-item">
+                    <span class="threshold-label">MEDIUM:</span>
+                    <span class="threshold-nosignal">€5-€15 per trade</span>
+                </div>
+                <div class="threshold-item">
+                    <span class="threshold-label">HIGH COST:</span>
+                    <span class="threshold-value">>€15 per trade</span>
+                </div>
+                <div class="threshold-item">
+                    <span class="threshold-label">MIN PROFIT:</span>
+                    <span class="threshold-value">>€50 needed</span>
+                </div>
+                <div style="margin-top: 4px; color: #ffff00; font-size: 8px;">
+                    → WHAT HAPPENS: Only execute if expected profit > 3× cost
+                </div>
+            </div>
+        </div>
+
+        <!-- Metric 6: Kelly Criterion Position Size -->
+        <div class="metric-card">
+            <h3>6. POSITION SIZE (Kelly)</h3>
+            <div class="metric-description">
+                <strong>MEASURES:</strong> Optimal bet size based on edge and odds<br>
+                <strong>THEORY:</strong> Bet too small = low profit, too big = bankruptcy<br>
+                <strong>CALCULATION:</strong> (Win Rate - Loss Rate) / Avg Win × Capital
+            </div>
+            <div class="metric-thresholds">
+                <div class="threshold-item">
+                    <span class="threshold-label">MAX RISK:</span>
+                    <span class="threshold-value">2% of capital</span>
+                </div>
+                <div class="threshold-item">
+                    <span class="threshold-label">TYPICAL TRADE:</span>
+                    <span class="threshold-value">€200-€500</span>
+                </div>
+                <div class="threshold-item">
+                    <span class="threshold-label">MAX LEVERAGE:</span>
+                    <span class="threshold-nosignal">5x (€1000 → €5000)</span>
+                </div>
+                <div class="threshold-item">
+                    <span class="threshold-label">STOP LOSS:</span>
+                    <span class="threshold-value">-0.5% max</span>
+                </div>
+                <div style="margin-top: 4px; color: #ffff00; font-size: 8px;">
+                    → WHAT HAPPENS: Limits drawdown to 10% even after 10 losses
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Data Table -->
+    <table class="main-table">
+        <thead>
+            <tr>
+                <th rowspan="2">SYMBOL</th>
+                <th rowspan="2">BID</th>
+                <th rowspan="2">ASK</th>
+                <th rowspan="2">SPREAD</th>
+                <th colspan="6">RENAISSANCE METRICS</th>
+                <th rowspan="2">SIGNAL</th>
+            </tr>
+            <tr>
+                <th>MEAN REV</th>
+                <th>ORDER FLOW</th>
+                <th>SPREAD VOL</th>
+                <th>HMM STATE</th>
+                <th>TX COST</th>
+                <th>KELLY SIZE</th>
+            </tr>
+        </thead>
+        <tbody id="assetTable">
+            <tr>
+                <td colspan="13" style="text-align: center; padding: 30px;">
+                    Waiting for tick data from database...
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- Legend -->
+    <div class="legend">
+        <div class="legend-title">SIGNAL GENERATION LOGIC (ALL CONDITIONS MUST ALIGN):</div>
+        <div style="margin-top: 4px;">
+            <strong style="color: #00ff00;">ENTER LONG:</strong> Mean Reversion < -1% + Order Flow > +2000 + Spread Widening > +20% + HMM Bullish + TX Cost < €10 + Kelly < 2%<br>
+            <strong style="color: #ff00ff;">ENTER SHORT:</strong> Mean Reversion > +1% + Order Flow < -2000 + Spread Widening > +20% + HMM Bearish + TX Cost < €10 + Kelly < 2%<br>
+            <strong style="color: #666666;">WAIT:</strong> Conditions not aligned or conflicting signals
+        </div>
+    </div>
+
+    <script>
+        // Update terminal
+        async function updateTerminal() {
+            try {
+                const response = await fetch('live_ticks.json?' + Date.now());
+                if (!response.ok) throw new Error('Failed to fetch');
+
+                const data = await response.json();
+
+                // Update status
+                document.getElementById('dbStatus').textContent = 'CONNECTED';
+                document.getElementById('dbStatus').className = 'status-connected';
+                document.getElementById('lastUpdate').textContent = new Date().toLocaleTimeString();
+
+                let totalTicks = 0;
+                let liveAssets = 0;
+                let entrySignals = 0;
+
+                // Render table
+                const tbody = document.getElementById('assetTable');
+                const rows = data.ticks.map(tick => {
+                    totalTicks += tick.volume;
+                    const isLive = tick.seconds_ago < 5;
+                    if (isLive) liveAssets++;
+
+                    // Calculate Renaissance metrics (PLACEHOLDER - needs real database queries)
+                    const metrics = calculateRenaissanceMetrics(tick);
+
+                    // Determine signal
+                    let signal = 'WAIT';
+                    let signalClass = 'signal-wait';
+
+                    if (metrics.allConditionsLong) {
+                        signal = 'ENTER LONG';
+                        signalClass = 'signal-enter';
+                        entrySignals++;
+                    } else if (metrics.allConditionsShort) {
+                        signal = 'ENTER SHORT';
+                        signalClass = 'signal-short';
+                        entrySignals++;
+                    }
+
+                    return `
+                        <tr class="${isLive ? 'live' : 'stale'}">
+                            <td class="symbol">${tick.symbol}</td>
+                            <td class="price">${tick.bid.toFixed(2)}</td>
+                            <td class="price">${tick.ask.toFixed(2)}</td>
+                            <td>${tick.spread.toFixed(2)}</td>
+                            <td class="${metrics.meanRevClass}">${metrics.meanRevValue}</td>
+                            <td class="${metrics.orderFlowClass}">${metrics.orderFlowValue}</td>
+                            <td class="${metrics.spreadVolClass}">${metrics.spreadVolValue}</td>
+                            <td class="${metrics.hmmClass}">${metrics.hmmValue}</td>
+                            <td class="${metrics.txCostClass}">${metrics.txCostValue}</td>
+                            <td class="${metrics.kellySizeClass}">${metrics.kellySizeValue}</td>
+                            <td class="${signalClass}">${signal}</td>
+                        </tr>
+                    `;
+                }).join('');
+
+                tbody.innerHTML = rows;
+
+                document.getElementById('totalTicks').textContent = totalTicks.toLocaleString();
+                document.getElementById('liveAssets').textContent = liveAssets;
+                document.getElementById('entrySignals').textContent = entrySignals;
+
+            } catch (error) {
+                document.getElementById('dbStatus').textContent = 'DISCONNECTED';
+                document.getElementById('dbStatus').className = 'status-disconnected';
+                console.error('Error:', error);
+            }
+        }
+
+        // Calculate Renaissance metrics - Now using REAL data from C++ backend
+        function calculateRenaissanceMetrics(tick) {
+            // Check if Renaissance metrics exist in tick data
+            if (!tick.renaissance) {
+                // Fallback if C++ backend not updated yet
+                return {
+                    meanRevValue: 'N/A', meanRevClass: 'metric-neutral',
+                    orderFlowValue: 'N/A', orderFlowClass: 'metric-neutral',
+                    spreadVolValue: 'N/A', spreadVolClass: 'metric-neutral',
+                    hmmValue: 'N/A', hmmClass: 'metric-neutral',
+                    txCostValue: 'N/A', txCostClass: 'metric-neutral',
+                    kellySizeValue: 'N/A', kellySizeClass: 'metric-neutral',
+                    allConditionsLong: false,
+                    allConditionsShort: false
+                };
+            }
+
+            const r = tick.renaissance;
+
+            // 1. Mean Reversion - Real calculation from last 20 ticks
+            const meanRevPercent = r.mean_reversion.value.toFixed(2);
+            const meanRevSignal = r.mean_reversion.signal;
+            const meanRevStatus = r.mean_reversion.status;
+            const meanRevClass = meanRevSignal ? 'metric-signal' :
+                               (meanRevStatus === 'SELL_ZONE' ? 'metric-nosignal' : 'metric-neutral');
+            const meanRevValue = meanRevPercent + '%';
+
+            // 2. Order Flow - Real calculation from last 100 ticks
+            const orderFlowValue = r.order_flow.value;
+            const orderFlowSignal = r.order_flow.signal;
+            const orderFlowStatus = r.order_flow.status;
+            const orderFlowClass = orderFlowSignal ? 'metric-signal' :
+                                  (orderFlowStatus === 'STRONG_SELL' ? 'metric-nosignal' : 'metric-neutral');
+            const orderFlowDisplay = orderFlowValue > 0 ? '+' + orderFlowValue : orderFlowValue;
+
+            // 3. Spread Volatility - Real calculation from last 100 ticks
+            const spreadVolPercent = r.spread_volatility.value.toFixed(0);
+            const spreadVolSignal = r.spread_volatility.signal;
+            const spreadVolStatus = r.spread_volatility.status;
+            const spreadVolClass = spreadVolSignal ? 'metric-signal' : 'metric-neutral';
+            const spreadVolValue = spreadVolPercent + '%';
+
+            // 4. HMM Regime - Real trend detection from last 20 ticks
+            const hmmValue = r.hmm_regime.value;
+            const hmmSignal = r.hmm_regime.signal;
+            const hmmClass = hmmSignal ? 'metric-signal' :
+                           (hmmValue === 'BEARISH' ? 'metric-nosignal' : 'metric-neutral');
+
+            // 5. Transaction Cost - Real calculation
+            const txCost = r.transaction_cost.value.toFixed(2);
+            const txCostSignal = r.transaction_cost.signal;
+            const txCostClass = txCostSignal ? 'metric-signal' : 'metric-nosignal';
+            const txCostValue = '€' + txCost;
+
+            // 6. Kelly Position Size - Real calculation
+            const kellySize = '€' + r.kelly_size.value.toFixed(0);
+            const kellySizeSignal = r.kelly_size.signal;
+            const kellySizeClass = kellySizeSignal ? 'metric-signal' : 'metric-nosignal';
+            const kellySizeValue = kellySize;
+
+            // Overall signal from C++ backend
+            const overallSignal = r.overall_signal;
+            const allConditionsLong = (overallSignal === 'ENTER_LONG');
+            const allConditionsShort = (overallSignal === 'ENTER_SHORT');
+
+            return {
+                meanRevValue, meanRevClass,
+                orderFlowValue: orderFlowDisplay,
+                orderFlowClass,
+                spreadVolValue, spreadVolClass,
+                hmmValue, hmmClass,
+                txCostValue, txCostClass,
+                kellySizeValue, kellySizeClass,
+                allConditionsLong,
+                allConditionsShort
+            };
+        }
+
+        // Update every 100ms to catch all ticks
+        updateTerminal();
+        setInterval(updateTerminal, 100);
+    </script>
+</body>
+</html>

@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KLDA-HFT Asset Surveillance System</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000;
+            color: #0f0;
+            padding: 20px;
+            font-size: 13px;
+        }
+
+        .header {
+            background: #001100;
+            border: 2px solid #0f0;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 22px;
+            color: #0ff;
+            margin-bottom: 5px;
+        }
+
+        .header .subtitle {
+            font-size: 11px;
+            color: #0a0;
+        }
+
+        .assets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .asset-card {
+            background: #001a00;
+            border: 2px solid #0a0;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .asset-card:hover {
+            background: #002200;
+            border-color: #0f0;
+            box-shadow: 0 0 10px #0f0;
+        }
+
+        .asset-card.live {
+            border-color: #0f0;
+        }
+
+        .asset-card.stale {
+            border-color: #555;
+            opacity: 0.6;
+        }
+
+        .asset-symbol {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0ff;
+            margin-bottom: 8px;
+        }
+
+        .asset-price {
+            font-size: 16px;
+            margin: 5px 0;
+        }
+
+        .asset-metrics {
+            font-size: 11px;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #0a0;
+        }
+
+        .metric-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 3px 0;
+        }
+
+        .signal-indicator {
+            padding: 3px 8px;
+            margin-top: 8px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .signal-enter {
+            background: #0f0;
+            color: #000;
+            animation: blink 1s infinite;
+        }
+
+        .signal-wait {
+            background: #333;
+            color: #888;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        .modal-content {
+            background: #001100;
+            border: 3px solid #0f0;
+            margin: 2% auto;
+            width: 90%;
+            max-width: 1400px;
+            height: 90%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .modal-header {
+            background: #002200;
+            border-bottom: 2px solid #0f0;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            color: #0ff;
+        }
+
+        .close-btn {
+            color: #f00;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+
+        .close-btn:hover {
+            color: #ff0;
+        }
+
+        .modal-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 10px;
+            background: #002200;
+            border: 1px solid #0a0;
+        }
+
+        .timeframe-btn {
+            padding: 5px 15px;
+            background: #003300;
+            border: 1px solid #0a0;
+            color: #0f0;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+        }
+
+        .timeframe-btn:hover {
+            background: #005500;
+        }
+
+        .timeframe-btn.active {
+            background: #0f0;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .chart-container {
+            background: #000;
+            border: 2px solid #0a0;
+            padding: 15px;
+            margin-bottom: 20px;
+            height: 500px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background: #002200;
+            border: 1px solid #0a0;
+            padding: 10px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #0a0;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #0f0;
+        }
+
+        .history-table {
+            background: #002200;
+            border: 1px solid #0a0;
+            padding: 15px;
+        }
+
+        .history-table h3 {
+            color: #0ff;
+            margin-bottom: 10px;
+        }
+
+        .history-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .history-table th,
+        .history-table td {
+            padding: 8px;
+            text-align: left;
+            border: 1px solid #0a0;
+        }
+
+        .history-table th {
+            background: #003300;
+            color: #0ff;
+        }
+
+        .history-table tr:hover {
+            background: #003300;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>KLDA-HFT ASSET SURVEILLANCE SYSTEM</h1>
+        <div class="subtitle">
+            Research Environment | Real-Time Market Analysis | Database: PostgreSQL + TimescaleDB | Last Update: <span id="last-update">--</span>
+        </div>
+    </div>
+
+    <div id="assets-grid" class="assets-grid">
+        <!-- Asset cards will be injected here -->
+    </div>
+
+    <!-- Modal for Asset Details -->
+    <div id="asset-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modal-title">ASSET DETAILS</div>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="chart-controls">
+                    <button class="timeframe-btn active" onclick="changeTimeframe('M1')">1 Min</button>
+                    <button class="timeframe-btn" onclick="changeTimeframe('M5')">5 Min</button>
+                    <button class="timeframe-btn" onclick="changeTimeframe('M15')">15 Min</button>
+                    <button class="timeframe-btn" onclick="changeTimeframe('H1')">1 Hour</button>
+                    <button class="timeframe-btn" onclick="changeTimeframe('H4')">4 Hour</button>
+                    <button class="timeframe-btn" onclick="changeTimeframe('D1')">1 Day</button>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="price-chart"></canvas>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-label">CURRENT PRICE</div>
+                        <div class="stat-value" id="stat-price">--</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">24H CHANGE</div>
+                        <div class="stat-value" id="stat-change">--</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">TOTAL TICKS</div>
+                        <div class="stat-value" id="stat-ticks">--</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">SPREAD</div>
+                        <div class="stat-value" id="stat-spread">--</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">RENAISSANCE SIGNAL</div>
+                        <div class="stat-value" id="stat-signal">--</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">LAST UPDATE</div>
+                        <div class="stat-value" id="stat-updated">--</div>
+                    </div>
+                </div>
+
+                <div class="history-table">
+                    <h3>RECENT TICKS (Last 50)</h3>
+                    <div style="max-height: 300px; overflow-y: auto;">
+                        <table id="tick-history">
+                            <thead>
+                                <tr>
+                                    <th>Time</th>
+                                    <th>Bid</th>
+                                    <th>Ask</th>
+                                    <th>Spread</th>
+                                    <th>Volume</th>
+                                </tr>
+                            </thead>
+                            <tbody id="history-body">
+                                <tr><td colspan="5" style="text-align: center;">Loading...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentSymbol = null;
+        let currentTimeframe = 'M1';
+        let priceChart = null;
+
+        // Fetch live ticks from C++ backend
+        async function fetchLiveTicks() {
+            try {
+                const response = await fetch('live_ticks.json?' + Date.now());
+                const data = await response.json();
+
+                updateLastUpdate();
+                renderAssetCards(data.ticks);
+            } catch (error) {
+                console.error('Error fetching ticks:', error);
+            }
+        }
+
+        function updateLastUpdate() {
+            document.getElementById('last-update').textContent = new Date().toLocaleTimeString();
+        }
+
+        function renderAssetCards(ticks) {
+            const grid = document.getElementById('assets-grid');
+            grid.innerHTML = '';
+
+            ticks.forEach(tick => {
+                const renaissance = tick.renaissance || {};
+                const signal = renaissance.overall_signal || 'WAIT';
+                const secondsAgo = tick.seconds_ago || 0;
+                const isLive = secondsAgo < 600; // < 10 minutes
+
+                const card = document.createElement('div');
+                card.className = `asset-card ${isLive ? 'live' : 'stale'}`;
+                card.onclick = () => openAssetModal(tick.symbol);
+
+                const age = secondsAgo < 60 ? `${Math.floor(secondsAgo)}s ago` :
+                            secondsAgo < 3600 ? `${Math.floor(secondsAgo/60)}m ago` :
+                            `${Math.floor(secondsAgo/3600)}h ago`;
+
+                card.innerHTML = `
+                    <div class="asset-symbol">${tick.symbol}</div>
+                    <div class="asset-price">
+                        <strong>BID:</strong> ${tick.bid.toFixed(2)} | <strong>ASK:</strong> ${tick.ask.toFixed(2)}
+                    </div>
+                    <div class="asset-metrics">
+                        <div class="metric-row">
+                            <span>Mean Rev:</span>
+                            <span>${(renaissance.mean_reversion?.value || 0).toFixed(2)}%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span>Regime:</span>
+                            <span>${renaissance.hmm_regime?.value || 'N/A'}</span>
+                        </div>
+                        <div class="metric-row">
+                            <span>TX Cost:</span>
+                            <span>$${(renaissance.transaction_cost?.value || 0).toFixed(2)}</span>
+                        </div>
+                        <div class="metric-row">
+                            <span>Updated:</span>
+                            <span>${age}</span>
+                        </div>
+                    </div>
+                    <div class="signal-indicator signal-${signal === 'ENTER_LONG' ? 'enter' : 'wait'}">
+                        ${signal}
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        async function openAssetModal(symbol) {
+            currentSymbol = symbol;
+            document.getElementById('modal-title').textContent = `${symbol} - DETAILED ANALYSIS`;
+            document.getElementById('asset-modal').style.display = 'block';
+
+            // Load chart data
+            await loadChartData(symbol, currentTimeframe);
+
+            // Load tick history
+            await loadTickHistory(symbol);
+        }
+
+        function closeModal() {
+            document.getElementById('asset-modal').style.display = 'none';
+            if (priceChart) {
+                priceChart.destroy();
+                priceChart = null;
+            }
+        }
+
+        async function changeTimeframe(timeframe) {
+            currentTimeframe = timeframe;
+
+            // Update button states
+            document.querySelectorAll('.timeframe-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Reload chart
+            await loadChartData(currentSymbol, timeframe);
+        }
+
+        async function loadChartData(symbol, timeframe) {
+            try {
+                console.log(`Loading chart data for ${symbol} ${timeframe}...`);
+
+                // Fetch real bar data from Flask API
+                const response = await fetch(`http://localhost:5000/api/bars/${symbol}/${timeframe}?limit=100`);
+                const bars = await response.json();
+
+                console.log(`Received ${bars.length} bars for ${symbol}`);
+
+                const ctx = document.getElementById('price-chart').getContext('2d');
+
+                if (priceChart) {
+                    priceChart.destroy();
+                }
+
+                if (bars.error) {
+                    console.error('Error loading chart data:', bars.error);
+                    ctx.fillStyle = '#f00';
+                    ctx.font = '16px Courier New';
+                    ctx.fillText(`Error: ${bars.error}`, 50, 100);
+                    return;
+                }
+
+                if (!bars || bars.length === 0) {
+                    console.warn('No bar data returned');
+                    ctx.fillStyle = '#ff0';
+                    ctx.font = '16px Courier New';
+                    ctx.fillText('No data available for this timeframe', 50, 100);
+                    return;
+                }
+
+                // Extract data for chart
+                const labels = bars.map(bar => {
+                    const date = new Date(bar.time);
+                    return date.toLocaleTimeString();
+                });
+                const closePrices = bars.map(bar => bar.close);
+                const highPrices = bars.map(bar => bar.high);
+                const lowPrices = bars.map(bar => bar.low);
+
+                console.log(`Creating chart with ${closePrices.length} data points`);
+
+                // Check if Chart.js is loaded
+                if (typeof Chart === 'undefined') {
+                    console.error('Chart.js library not loaded!');
+                    ctx.fillStyle = '#f00';
+                    ctx.font = '16px Courier New';
+                    ctx.fillText('Chart.js library failed to load', 50, 100);
+                    return;
+                }
+
+                priceChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            {
+                                label: `${symbol} ${timeframe} Close`,
+                                data: closePrices,
+                                borderColor: '#0f0',
+                                backgroundColor: 'rgba(0, 255, 0, 0.1)',
+                                borderWidth: 2,
+                                fill: true
+                            },
+                            {
+                                label: 'High',
+                                data: highPrices,
+                                borderColor: '#0ff',
+                                borderWidth: 1,
+                                pointRadius: 0,
+                                fill: false
+                            },
+                            {
+                                label: 'Low',
+                                data: lowPrices,
+                                borderColor: '#f80',
+                                borderWidth: 1,
+                                pointRadius: 0,
+                                fill: false
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                ticks: { color: '#0f0' },
+                                grid: { color: '#0a0' }
+                            },
+                            x: {
+                                ticks: {
+                                    color: '#0f0',
+                                    maxTicksLimit: 10
+                                },
+                                grid: { color: '#0a0' }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                labels: { color: '#0f0' }
+                            }
+                        }
+                    }
+                });
+
+                console.log('Chart created successfully');
+
+                // Update stats
+                await updateStats(symbol, bars);
+
+            } catch (error) {
+                console.error('Failed to load chart data:', error);
+                console.error('Error stack:', error.stack);
+            }
+        }
+
+        async function loadTickHistory(symbol) {
+            try {
+                // Fetch recent ticks from Flask API
+                const response = await fetch(`http://localhost:5000/api/ticks/${symbol}?limit=50`);
+                const ticks = await response.json();
+
+                const tbody = document.getElementById('history-body');
+
+                if (ticks.error) {
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #f00;">Error: ${ticks.error}</td></tr>`;
+                    return;
+                }
+
+                if (ticks.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No tick data available</td></tr>';
+                    return;
+                }
+
+                // Populate table
+                tbody.innerHTML = '';
+                ticks.forEach(tick => {
+                    const row = document.createElement('tr');
+                    const time = new Date(tick.time).toLocaleString();
+
+                    row.innerHTML = `
+                        <td>${time}</td>
+                        <td>${tick.bid.toFixed(2)}</td>
+                        <td>${tick.ask.toFixed(2)}</td>
+                        <td>${tick.spread}</td>
+                        <td>${tick.volume}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
+
+            } catch (error) {
+                console.error('Failed to load tick history:', error);
+                const tbody = document.getElementById('history-body');
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #f00;">Failed to load data</td></tr>';
+            }
+        }
+
+        async function updateStats(symbol, bars) {
+            try {
+                // Fetch symbol statistics from Flask API
+                const response = await fetch(`http://localhost:5000/api/stats/${symbol}`);
+                const stats = await response.json();
+
+                if (stats.error) {
+                    console.error('Error loading stats:', stats.error);
+                    return;
+                }
+
+                // Update stat boxes
+                document.getElementById('stat-price').textContent = `$${stats.current_price}`;
+
+                if (stats['24h_change'] !== null) {
+                    const changeColor = stats['24h_change'] >= 0 ? '#0f0' : '#f00';
+                    document.getElementById('stat-change').innerHTML = `<span style="color: ${changeColor};">${stats['24h_change'] >= 0 ? '+' : ''}${stats['24h_change']} (${stats['24h_change_pct']}%)</span>`;
+                } else {
+                    document.getElementById('stat-change').textContent = 'N/A';
+                }
+
+                document.getElementById('stat-ticks').textContent = stats.total_ticks.toLocaleString();
+                document.getElementById('stat-spread').textContent = stats.avg_spread;
+
+                // Get latest tick time
+                const latestBar = bars[bars.length - 1];
+                if (latestBar) {
+                    const lastTime = new Date(latestBar.time);
+                    const secondsAgo = Math.floor((Date.now() - lastTime.getTime()) / 1000);
+                    const timeAgo = secondsAgo < 60 ? `${secondsAgo}s ago` :
+                                   secondsAgo < 3600 ? `${Math.floor(secondsAgo/60)}m ago` :
+                                   `${Math.floor(secondsAgo/3600)}h ago`;
+                    document.getElementById('stat-updated').textContent = timeAgo;
+                } else {
+                    document.getElementById('stat-updated').textContent = 'Unknown';
+                }
+
+                // Renaissance signal (from live_ticks.json)
+                document.getElementById('stat-signal').textContent = 'Loading...';
+
+            } catch (error) {
+                console.error('Failed to load stats:', error);
+            }
+        }
+
+        // Start fetching live data
+        fetchLiveTicks();
+        setInterval(fetchLiveTicks, 1000);
+    </script>
+</body>
+</html>

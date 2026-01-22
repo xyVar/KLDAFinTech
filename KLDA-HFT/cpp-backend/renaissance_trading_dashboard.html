@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Renaissance Trading Dashboard - LIVE</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #000;
+            color: #0f0;
+            padding: 20px;
+            font-size: 14px;
+        }
+
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: #001100;
+            border: 2px solid #0f0;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #0ff;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .stat-box {
+            background: #002200;
+            border: 1px solid #0f0;
+            padding: 10px;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #0a0;
+            margin-bottom: 5px;
+        }
+
+        .stat-value {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .stat-value.positive { color: #0f0; }
+        .stat-value.negative { color: #f00; }
+        .stat-value.neutral { color: #ff0; }
+
+        .section {
+            background: #001100;
+            border: 2px solid #0f0;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            color: #0ff;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #0f0;
+            padding-bottom: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border: 1px solid #0a0;
+        }
+
+        th {
+            background: #002200;
+            color: #0ff;
+            font-weight: bold;
+        }
+
+        tr:nth-child(even) {
+            background: #001100;
+        }
+
+        tr:hover {
+            background: #002200;
+        }
+
+        .signal-buy {
+            color: #0f0;
+            font-weight: bold;
+        }
+
+        .signal-sell {
+            color: #f00;
+            font-weight: bold;
+        }
+
+        .signal-wait {
+            color: #888;
+        }
+
+        .metric-box {
+            display: inline-block;
+            padding: 5px 10px;
+            background: #002200;
+            border: 1px solid #0a0;
+            margin: 2px;
+            font-size: 12px;
+        }
+
+        .blink {
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.3; }
+        }
+
+        .position-row {
+            background: #002200 !important;
+        }
+
+        .position-row.winning {
+            background: #001a00 !important;
+            border-left: 4px solid #0f0;
+        }
+
+        .position-row.losing {
+            background: #1a0000 !important;
+            border-left: 4px solid #f00;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header with Account Stats -->
+        <div class="header">
+            <h1>RENAISSANCE TRADING DASHBOARD - LIVE</h1>
+            <div style="font-size: 12px; color: #0a0; margin-top: 5px;">
+                Broker: Pepperstone MT5 Demo | Strategy: 5-Metric Renaissance | Last Update: <span id="last-update">--</span>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-box">
+                    <div class="stat-label">ACCOUNT BALANCE</div>
+                    <div class="stat-value" id="balance">$10,000.00</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">OPEN POSITIONS</div>
+                    <div class="stat-value neutral" id="open-positions">0</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">UNREALIZED P&L</div>
+                    <div class="stat-value neutral" id="unrealized-pnl">$0.00</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">REALIZED P&L</div>
+                    <div class="stat-value neutral" id="realized-pnl">$0.00</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">WIN RATE</div>
+                    <div class="stat-value neutral" id="win-rate">0%</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-label">TOTAL TRADES</div>
+                    <div class="stat-value neutral" id="total-trades">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Open Positions -->
+        <div class="section">
+            <div class="section-title">OPEN POSITIONS</div>
+            <table id="positions-table">
+                <thead>
+                    <tr>
+                        <th>SYMBOL</th>
+                        <th>ENTRY TIME</th>
+                        <th>ENTRY PRICE</th>
+                        <th>CURRENT PRICE</th>
+                        <th>POSITION SIZE</th>
+                        <th>STOP LOSS</th>
+                        <th>TAKE PROFIT</th>
+                        <th>P&L</th>
+                        <th>P&L %</th>
+                        <th>STATUS</th>
+                    </tr>
+                </thead>
+                <tbody id="positions-body">
+                    <tr>
+                        <td colspan="10" style="text-align: center; color: #888;">No open positions</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Live Market Data with Signals -->
+        <div class="section">
+            <div class="section-title">LIVE MARKET DATA & ENTRY SIGNALS</div>
+            <table id="market-table">
+                <thead>
+                    <tr>
+                        <th>SYMBOL</th>
+                        <th>BID</th>
+                        <th>ASK</th>
+                        <th>SPREAD</th>
+                        <th>MEAN REV</th>
+                        <th>SPREAD VOL</th>
+                        <th>HMM REGIME</th>
+                        <th>TX COST</th>
+                        <th>KELLY</th>
+                        <th>SIGNAL</th>
+                    </tr>
+                </thead>
+                <tbody id="market-body">
+                    <tr>
+                        <td colspan="10" style="text-align: center; color: #888;">Loading live data...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Closed Trades History -->
+        <div class="section">
+            <div class="section-title">CLOSED TRADES (Last 20)</div>
+            <table id="history-table">
+                <thead>
+                    <tr>
+                        <th>SYMBOL</th>
+                        <th>ENTRY TIME</th>
+                        <th>EXIT TIME</th>
+                        <th>ENTRY $</th>
+                        <th>EXIT $</th>
+                        <th>POSITION SIZE</th>
+                        <th>P&L</th>
+                        <th>P&L %</th>
+                        <th>RESULT</th>
+                    </tr>
+                </thead>
+                <tbody id="history-body">
+                    <tr>
+                        <td colspan="9" style="text-align: center; color: #888;">No closed trades yet</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // Trading state
+        let positions = [];
+        let closedTrades = [];
+        let accountBalance = 10000.00;
+        let realizedPnL = 0;
+
+        // Fetch live ticks
+        async function fetchLiveTicks() {
+            try {
+                const response = await fetch('live_ticks.json?' + Date.now());
+                const data = await response.json();
+
+                updateLastUpdate();
+                updateMarketTable(data.ticks);
+                updatePositions(data.ticks);
+                updateAccountStats();
+
+            } catch (error) {
+                console.error('Error fetching live ticks:', error);
+            }
+        }
+
+        function updateLastUpdate() {
+            const now = new Date();
+            document.getElementById('last-update').textContent = now.toLocaleTimeString();
+        }
+
+        function updateMarketTable(ticks) {
+            const tbody = document.getElementById('market-body');
+            tbody.innerHTML = '';
+
+            // Filter to live symbols only
+            const liveSymbols = ['NAS100', 'SpotCrude', 'NatGas', 'VIX'];
+            const liveTicks = ticks.filter(t => liveSymbols.includes(t.symbol));
+
+            liveTicks.forEach(tick => {
+                const renaissance = tick.renaissance || {};
+                const meanRev = renaissance.mean_reversion || {};
+                const spreadVol = renaissance.spread_volatility || {};
+                const regime = renaissance.hmm_regime || {};
+                const txCost = renaissance.transaction_cost || {};
+                const kelly = renaissance.kelly_size || {};
+                const signal = renaissance.overall_signal || 'WAIT';
+
+                const row = document.createElement('tr');
+
+                // Check if all signals are true
+                const allTrue =
+                    (meanRev.signal === true) &&
+                    (spreadVol.signal === true) &&
+                    (regime.signal === true) &&
+                    (txCost.signal === true) &&
+                    (kelly.signal === true);
+
+                if (allTrue) {
+                    row.classList.add('blink');
+                }
+
+                row.innerHTML = `
+                    <td><strong>${tick.symbol}</strong></td>
+                    <td>${tick.bid.toFixed(2)}</td>
+                    <td>${tick.ask.toFixed(2)}</td>
+                    <td>${tick.spread.toFixed(4)}</td>
+                    <td><span class="metric-box">${(meanRev.value || 0).toFixed(2)}%</span></td>
+                    <td><span class="metric-box">${(spreadVol.value || 0).toFixed(2)}%</span></td>
+                    <td><span class="metric-box">${regime.value || 'N/A'}</span></td>
+                    <td><span class="metric-box">$${(txCost.value || 0).toFixed(2)}</span></td>
+                    <td><span class="metric-box">${(kelly.kelly_pct || 0).toFixed(2)}%</span></td>
+                    <td class="${signal === 'ENTER_LONG' ? 'signal-buy' : 'signal-wait'}">${signal}</td>
+                `;
+
+                tbody.appendChild(row);
+            });
+        }
+
+        function updatePositions(ticks) {
+            const tbody = document.getElementById('positions-body');
+
+            if (positions.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: #888;">No open positions</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = '';
+
+            positions.forEach(pos => {
+                const tickData = ticks.find(t => t.symbol === pos.symbol);
+                if (!tickData) return;
+
+                const currentPrice = tickData.bid;
+                const pnl = (currentPrice - pos.entryPrice) * pos.shares - pos.txCost;
+                const pnlPct = ((currentPrice - pos.entryPrice) / pos.entryPrice) * 100.0;
+
+                const row = document.createElement('tr');
+                row.classList.add('position-row');
+                row.classList.add(pnl > 0 ? 'winning' : 'losing');
+
+                row.innerHTML = `
+                    <td><strong>${pos.symbol}</strong></td>
+                    <td>${pos.entryTime}</td>
+                    <td>$${pos.entryPrice.toFixed(2)}</td>
+                    <td>$${currentPrice.toFixed(2)}</td>
+                    <td>$${pos.positionSize.toFixed(2)}</td>
+                    <td>$${pos.stopLoss.toFixed(2)}</td>
+                    <td>$${pos.takeProfit.toFixed(2)}</td>
+                    <td class="${pnl > 0 ? 'positive' : 'negative'}">$${pnl.toFixed(2)}</td>
+                    <td class="${pnlPct > 0 ? 'positive' : 'negative'}">${pnlPct > 0 ? '+' : ''}${pnlPct.toFixed(2)}%</td>
+                    <td>${pnl > 0 ? 'WINNING' : 'LOSING'}</td>
+                `;
+
+                tbody.appendChild(row);
+            });
+        }
+
+        function updateAccountStats() {
+            // Calculate unrealized P&L
+            let unrealizedPnL = 0;
+            // This would be calculated from positions if any exist
+
+            document.getElementById('balance').textContent = `$${accountBalance.toFixed(2)}`;
+            document.getElementById('open-positions').textContent = positions.length;
+            document.getElementById('unrealized-pnl').textContent = `$${unrealizedPnL.toFixed(2)}`;
+            document.getElementById('realized-pnl').textContent = `$${realizedPnL.toFixed(2)}`;
+            document.getElementById('total-trades').textContent = closedTrades.length;
+
+            const winRate = closedTrades.length > 0
+                ? (closedTrades.filter(t => t.result === 'WIN').length / closedTrades.length * 100).toFixed(1)
+                : '0.0';
+            document.getElementById('win-rate').textContent = `${winRate}%`;
+
+            // Update colors
+            const unrealizedEl = document.getElementById('unrealized-pnl');
+            unrealizedEl.className = 'stat-value ' + (unrealizedPnL > 0 ? 'positive' : unrealizedPnL < 0 ? 'negative' : 'neutral');
+
+            const realizedEl = document.getElementById('realized-pnl');
+            realizedEl.className = 'stat-value ' + (realizedPnL > 0 ? 'positive' : realizedPnL < 0 ? 'negative' : 'neutral');
+        }
+
+        // Start fetching live data
+        fetchLiveTicks();
+        setInterval(fetchLiveTicks, 1000);
+    </script>
+</body>
+</html>

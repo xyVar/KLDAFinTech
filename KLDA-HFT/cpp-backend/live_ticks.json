@@ -1,194 +1,891 @@
 {
   "ticks": [
     {
-      "ask": 256.58,
-      "bid": 256.56,
+      "ask": 245.61,
+      "bid": 245.56,
       "buy_volume": 0,
-      "last_updated": "2026-01-16 19:45:04.383+01",
-      "seconds_ago": -7182.981474,
+      "last_updated": "2026-01-21 20:08:47.443+01",
+      "renaissance": {
+        "hmm_regime": {
+          "signal": false,
+          "status": "NEUTRAL",
+          "trend_pct": -0.03749841211934002,
+          "value": "NEUTRAL"
+        },
+        "kelly_size": {
+          "kelly_pct": 1.9812499999999924,
+          "signal": true,
+          "status": "SAFE",
+          "value": 19.812499999999925
+        },
+        "mean_reversion": {
+          "ma50": 245.52159999999995,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": 0.025822575284642296
+        },
+        "order_flow": {
+          "buy_volume": 0,
+          "sell_volume": 0,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": 0
+        },
+        "overall_signal": "WAIT",
+        "spread_volatility": {
+          "avg_spread": 5.91,
+          "signal": false,
+          "status": "NORMAL",
+          "value": -15.397631133671744
+        },
+        "transaction_cost": {
+          "signal": true,
+          "spread_cost": 2.5,
+          "status": "ACCEPTABLE",
+          "swap_cost": 0.096,
+          "value": 2.596
+        }
+      },
+      "seconds_ago": 78093.483238,
       "sell_volume": 0,
-      "spread": 2.0,
+      "spread": 5.0,
       "symbol": "AAPL",
       "volume": 0
     },
     {
-      "ask": 232.33,
-      "bid": 232.25,
+      "ask": 246.2,
+      "bid": 246.04,
       "buy_volume": 0,
-      "last_updated": "2026-01-16 19:45:03.879+01",
-      "seconds_ago": -7182.477474,
+      "last_updated": "2026-01-21 20:08:46.076+01",
+      "renaissance": {
+        "hmm_regime": {
+          "signal": false,
+          "status": "NEUTRAL",
+          "trend_pct": -0.002840120680867791,
+          "value": "NEUTRAL"
+        },
+        "kelly_size": {
+          "kelly_pct": 1.9812499999999924,
+          "signal": true,
+          "status": "SAFE",
+          "value": 19.812499999999925
+        },
+        "mean_reversion": {
+          "ma50": 246.19979999999995,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": -0.03241269895424327
+        },
+        "order_flow": {
+          "buy_volume": 0,
+          "sell_volume": 0,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": 0
+        },
+        "overall_signal": "WAIT",
+        "spread_volatility": {
+          "avg_spread": 14.75,
+          "signal": false,
+          "status": "NORMAL",
+          "value": 8.47457627118644
+        },
+        "transaction_cost": {
+          "signal": true,
+          "spread_cost": 8.0,
+          "status": "ACCEPTABLE",
+          "swap_cost": 0.096,
+          "value": 8.096
+        }
+      },
+      "seconds_ago": 78094.850238,
       "sell_volume": 0,
-      "spread": 8.0,
+      "spread": 16.0,
       "symbol": "AMD",
       "volume": 0
     },
     {
-      "ask": 238.19,
-      "bid": 238.1,
+      "ask": 228.1,
+      "bid": 227.98,
       "buy_volume": 0,
-      "last_updated": "2026-01-16 19:45:04.095+01",
-      "seconds_ago": -7182.693474,
+      "last_updated": "2026-01-21 20:08:46.162+01",
+      "renaissance": {
+        "hmm_regime": {
+          "signal": false,
+          "status": "NEUTRAL",
+          "trend_pct": 0.024352636710434847,
+          "value": "NEUTRAL"
+        },
+        "kelly_size": {
+          "kelly_pct": 1.9812499999999924,
+          "signal": true,
+          "status": "SAFE",
+          "value": 19.812499999999925
+        },
+        "mean_reversion": {
+          "ma50": 227.88060000000002,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": 0.06994891184241953
+        },
+        "order_flow": {
+          "buy_volume": 0,
+          "sell_volume": 0,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": 0
+        },
+        "overall_signal": "WAIT",
+        "spread_volatility": {
+          "avg_spread": 8.36,
+          "signal": true,
+          "status": "WIDENING",
+          "value": 43.54066985645934
+        },
+        "transaction_cost": {
+          "signal": true,
+          "spread_cost": 6.0,
+          "status": "ACCEPTABLE",
+          "swap_cost": 0.096,
+          "value": 6.096
+        }
+      },
+      "seconds_ago": 78094.764238,
       "sell_volume": 0,
-      "spread": 9.0,
+      "spread": 12.0,
       "symbol": "AMZN",
       "volume": 0
     },
     {
-      "ask": 347.65,
-      "bid": 347.4,
+      "ask": 325.4,
+      "bid": 325.23,
       "buy_volume": 0,
-      "last_updated": "2026-01-16 19:45:02.584+01",
-      "seconds_ago": -7181.182474,
+      "last_updated": "2026-01-21 20:08:44.755+01",
+      "renaissance": {
+        "hmm_regime": {
+          "signal": false,
+          "status": "NEUTRAL",
+          "trend_pct": 0.04441910113568224,
+          "value": "NEUTRAL"
+        },
+        "kelly_size": {
+          "kelly_pct": 1.9812499999999924,
+          "signal": true,
+          "status": "SAFE",
+          "value": 19.812499999999925
+        },
+        "mean_reversion": {
+          "ma50": 325.2414,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": 0.022629345464629965
+        },
+        "order_flow": {
+          "buy_volume": 0,
+          "sell_volume": 0,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": 0
+        },
+        "overall_signal": "WAIT",
+        "spread_volatility": {
+          "avg_spread": 20.02,
+          "signal": false,
+          "status": "NORMAL",
+          "value": -15.084915084915082
+        },
+        "transaction_cost": {
+          "signal": true,
+          "spread_cost": 8.5,
+          "status": "ACCEPTABLE",
+          "swap_cost": 0.096,
+          "value": 8.596
+        }
+      },
+      "seconds_ago": 78096.171238,
       "sell_volume": 0,
-      "spread": 25.0,
+      "spread": 17.0,
       "symbol": "AVGO",
       "volume": 0
     },
     {
-      "ask": 75.25,
-      "bid": 75.24,
+      "ask": 73.49,
+      "bid": 73.48,
       "buy_volume": 0,
-      "last_updated": "2026-01-16 19:44:55.985+01",
-      "seconds_ago": -7174.583474,
+      "last_updated": "2026-01-21 20:08:46.569+01",
+      "renaissance": {
+        "hmm_regime": {
+          "signal": false,
+          "status": "NEUTRAL",
+          "trend_pct": -0.1845684491091808,
+          "value": "NEUTRAL"
+        },
+        "kelly_size": {
+          "kelly_pct": 1.9812499999999924,
+          "signal": true,
+          "status": "SAFE",
+          "value": 19.812499999999925
+        },
+        "mean_reversion": {
+          "ma50": 73.537,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": -0.07071270244911637
+        },
+        "order_flow": {
+          "buy_volume": 0,
+          "sell_volume": 0,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": 0
+        },
+        "overall_signal": "WAIT",
+        "spread_volatility": {
+          "avg_spread": 2.36,
+          "signal": false,
+          "status": "TIGHTENING",
+          "value": -57.6271186440678
+        },
+        "transaction_cost": {
+          "signal": true,
+          "spread_cost": 0.5,
+          "status": "ACCEPTABLE",
+          "swap_cost": 0.096,
+          "value": 0.596
+        }
+      },
+      "seconds_ago": 78094.357238,
       "sell_volume": 0,
       "spread": 1.0,
       "symbol": "CSCO",
       "volume": 0
     },
     {
-      "ask": 331.12,
-      "bid": 331.01,
+      "ask": 327.68,
+      "bid": 327.53,
       "buy_volume": 0,
-      "last_updated": "2026-01-16 19:45:03.592+01",
-      "seconds_ago": -7182.190474,
+      "last_updated": "2026-01-21 20:08:46.352+01",
+      "renaissance": {
+        "hmm_regime": {
+          "signal": false,
+          "status": "NEUTRAL",
+          "trend_pct": -0.012637327919414526,
+          "value": "NEUTRAL"
+        },
+        "kelly_size": {
+          "kelly_pct": 1.9812499999999924,
+          "signal": true,
+          "status": "SAFE",
+          "value": 19.812499999999925
+        },
+        "mean_reversion": {
+          "ma50": 327.4394,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": 0.050574243661587574
+        },
+        "order_flow": {
+          "buy_volume": 0,
+          "sell_volume": 0,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": 0
+        },
+        "overall_signal": "WAIT",
+        "spread_volatility": {
+          "avg_spread": 14.97,
+          "signal": false,
+          "status": "NORMAL",
+          "value": 0.20040080160320214
+        },
+        "transaction_cost": {
+          "signal": true,
+          "spread_cost": 7.5,
+          "status": "ACCEPTABLE",
+          "swap_cost": 0.096,
+          "value": 7.596
+        }
+      },
+      "seconds_ago": 78094.574238,
       "sell_volume": 0,
-      "spread": 11.0,
+      "spread": 15.0,
       "symbol": "GOOG",
       "volume": 0
     },
     {
-      "ask": 47.02,
-      "bid": 47.0,
+      "ask": 53.19,
+      "bid": 53.18,
       "buy_volume": 0,
-      "last_updated": "2026-01-16 19:45:02.671+01",
-      "seconds_ago": -7181.269474,
+      "last_updated": "2026-01-21 20:08:46.776+01",
+      "renaissance": {
+        "hmm_regime": {
+          "signal": false,
+          "status": "NEUTRAL",
+          "trend_pct": 0.18399038805587148,
+          "value": "NEUTRAL"
+        },
+        "kelly_size": {
+          "kelly_pct": 1.9812499999999924,
+          "signal": true,
+          "status": "SAFE",
+          "value": 19.812499999999925
+        },
+        "mean_reversion": {
+          "ma50": 53.17260000000001,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": 0.023320281498351435
+        },
+        "order_flow": {
+          "buy_volume": 0,
+          "sell_volume": 0,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": 0
+        },
+        "overall_signal": "WAIT",
+        "spread_volatility": {
+          "avg_spread": 1.46,
+          "signal": false,
+          "status": "TIGHTENING",
+          "value": -31.506849315068493
+        },
+        "transaction_cost": {
+          "signal": true,
+          "spread_cost": 0.5,
+          "status": "ACCEPTABLE",
+          "swap_cost": 0.096,
+          "value": 0.596
+        }
+      },
+      "seconds_ago": 78094.150238,
       "sell_volume": 0,
-      "spread": 2.0,
+      "spread": 1.0,
       "symbol": "INTC",
       "volume": 0
     },
     {
-      "ask": 624.71,
-      "bid": 624.23,
+      "ask": 609.14,
+      "bid": 608.92,
       "buy_volume": 0,
-      "last_updated": "2026-01-16 19:45:00.714+01",
-      "seconds_ago": -7179.312474,
+      "last_updated": "2026-01-21 20:08:44.693+01",
+      "renaissance": {
+        "hmm_regime": {
+          "signal": false,
+          "status": "NEUTRAL",
+          "trend_pct": -0.049451558898041606,
+          "value": "NEUTRAL"
+        },
+        "kelly_size": {
+          "kelly_pct": 1.9812499999999924,
+          "signal": true,
+          "status": "SAFE",
+          "value": 19.812499999999925
+        },
+        "mean_reversion": {
+          "ma50": 608.8883999999999,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": 0.02325549312485498
+        },
+        "order_flow": {
+          "buy_volume": 0,
+          "sell_volume": 0,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": 0
+        },
+        "overall_signal": "WAIT",
+        "spread_volatility": {
+          "avg_spread": 35.25,
+          "signal": false,
+          "status": "TIGHTENING",
+          "value": -37.5886524822695
+        },
+        "transaction_cost": {
+          "signal": false,
+          "spread_cost": 11.0,
+          "status": "HIGH_COST",
+          "swap_cost": 0.096,
+          "value": 11.096
+        }
+      },
+      "seconds_ago": 78096.233238,
       "sell_volume": 0,
-      "spread": 48.0,
+      "spread": 22.0,
       "symbol": "META",
       "volume": 0
     },
     {
-      "ask": 461.18,
-      "bid": 461.0,
+      "ask": 444.14,
+      "bid": 444.1,
       "buy_volume": 0,
-      "last_updated": "2026-01-16 19:45:03.219+01",
-      "seconds_ago": -7181.817474,
+      "last_updated": "2026-01-21 20:08:45.094+01",
+      "renaissance": {
+        "hmm_regime": {
+          "signal": false,
+          "status": "NEUTRAL",
+          "trend_pct": -0.013376139983650028,
+          "value": "NEUTRAL"
+        },
+        "kelly_size": {
+          "kelly_pct": 1.9812499999999924,
+          "signal": true,
+          "status": "SAFE",
+          "value": 19.812499999999925
+        },
+        "mean_reversion": {
+          "ma50": 444.0341999999997,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": 0.01932283594378324
+        },
+        "order_flow": {
+          "buy_volume": 0,
+          "sell_volume": 0,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": 0
+        },
+        "overall_signal": "WAIT",
+        "spread_volatility": {
+          "avg_spread": 17.77,
+          "signal": false,
+          "status": "TIGHTENING",
+          "value": -77.4901519414744
+        },
+        "transaction_cost": {
+          "signal": true,
+          "spread_cost": 2.0,
+          "status": "ACCEPTABLE",
+          "swap_cost": 0.096,
+          "value": 2.096
+        }
+      },
+      "seconds_ago": 78095.832238,
       "sell_volume": 0,
-      "spread": 18.0,
+      "spread": 4.0,
       "symbol": "MSFT",
       "volume": 0
     },
     {
-      "ask": 25577.0,
-      "bid": 25576.0,
+      "ask": 25063.6,
+      "bid": 25062.6,
       "buy_volume": 0,
-      "last_updated": "2026-01-16 19:45:04.782+01",
-      "seconds_ago": -7183.380474,
+      "last_updated": "2026-01-21 20:08:47.746+01",
+      "renaissance": {
+        "hmm_regime": {
+          "signal": false,
+          "status": "NEUTRAL",
+          "trend_pct": -0.011734638058061322,
+          "value": "NEUTRAL"
+        },
+        "kelly_size": {
+          "kelly_pct": 1.9812499999999924,
+          "signal": true,
+          "status": "SAFE",
+          "value": 19.812499999999925
+        },
+        "mean_reversion": {
+          "ma50": 25061.793999999998,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": 0.005211119363603798
+        },
+        "order_flow": {
+          "buy_volume": 0,
+          "sell_volume": 0,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": 0
+        },
+        "overall_signal": "WAIT",
+        "spread_volatility": {
+          "avg_spread": 10.0,
+          "signal": false,
+          "status": "NORMAL",
+          "value": 0.0
+        },
+        "transaction_cost": {
+          "signal": true,
+          "spread_cost": 5.0,
+          "status": "ACCEPTABLE",
+          "swap_cost": 0.096,
+          "value": 5.096
+        }
+      },
+      "seconds_ago": 78093.180238,
       "sell_volume": 0,
       "spread": 10.0,
       "symbol": "NAS100",
       "volume": 0
     },
     {
-      "ask": 3.233,
-      "bid": 3.229,
+      "ask": 4.862,
+      "bid": 4.857,
       "buy_volume": 0,
-      "last_updated": "2026-01-16 19:44:57.238+01",
-      "seconds_ago": -7175.836474,
+      "last_updated": "2026-01-21 20:08:46.856+01",
+      "renaissance": {
+        "hmm_regime": {
+          "signal": false,
+          "status": "NEUTRAL",
+          "trend_pct": 0.2574513146339818,
+          "value": "NEUTRAL"
+        },
+        "kelly_size": {
+          "kelly_pct": 1.9812499999999924,
+          "signal": true,
+          "status": "SAFE",
+          "value": 19.812499999999925
+        },
+        "mean_reversion": {
+          "ma50": 4.857000000000001,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": 0.05147210212064036
+        },
+        "order_flow": {
+          "buy_volume": 0,
+          "sell_volume": 0,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": 0
+        },
+        "overall_signal": "WAIT",
+        "spread_volatility": {
+          "avg_spread": 5.85,
+          "signal": false,
+          "status": "NORMAL",
+          "value": -14.529914529914526
+        },
+        "transaction_cost": {
+          "signal": true,
+          "spread_cost": 2.5,
+          "status": "ACCEPTABLE",
+          "swap_cost": 0.096,
+          "value": 2.596
+        }
+      },
+      "seconds_ago": 78094.070238,
       "sell_volume": 0,
-      "spread": 4.0,
+      "spread": 5.0,
       "symbol": "NatGas",
       "volume": 0
     },
     {
-      "ask": 187.75,
-      "bid": 187.74,
+      "ask": 180.03,
+      "bid": 180.0,
       "buy_volume": 0,
-      "last_updated": "2026-01-16 19:45:04.609+01",
-      "seconds_ago": -7183.207474,
+      "last_updated": "2026-01-21 20:08:46.881+01",
+      "renaissance": {
+        "hmm_regime": {
+          "signal": false,
+          "status": "NEUTRAL",
+          "trend_pct": -0.025380597893582955,
+          "value": "NEUTRAL"
+        },
+        "kelly_size": {
+          "kelly_pct": 1.9812499999999924,
+          "signal": true,
+          "status": "SAFE",
+          "value": 19.812499999999925
+        },
+        "mean_reversion": {
+          "ma50": 179.9653999999999,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": 0.027560853364081865
+        },
+        "order_flow": {
+          "buy_volume": 0,
+          "sell_volume": 0,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": 0
+        },
+        "overall_signal": "WAIT",
+        "spread_volatility": {
+          "avg_spread": 1.66,
+          "signal": true,
+          "status": "WIDENING",
+          "value": 80.72289156626506
+        },
+        "transaction_cost": {
+          "signal": true,
+          "spread_cost": 1.5,
+          "status": "ACCEPTABLE",
+          "swap_cost": 0.096,
+          "value": 1.596
+        }
+      },
+      "seconds_ago": 78094.045238,
       "sell_volume": 0,
-      "spread": 1.0,
+      "spread": 3.0,
       "symbol": "NVDA",
       "volume": 0
     },
     {
-      "ask": 189.2,
-      "bid": 189.07,
+      "ask": 171.49,
+      "bid": 171.36,
       "buy_volume": 0,
-      "last_updated": "2026-01-16 19:45:00.902+01",
-      "seconds_ago": -7179.500474,
+      "last_updated": "2026-01-21 20:08:45.808+01",
+      "renaissance": {
+        "hmm_regime": {
+          "signal": false,
+          "status": "NEUTRAL",
+          "trend_pct": -0.05270102967915171,
+          "value": "NEUTRAL"
+        },
+        "kelly_size": {
+          "kelly_pct": 1.9812499999999924,
+          "signal": true,
+          "status": "SAFE",
+          "value": 19.812499999999925
+        },
+        "mean_reversion": {
+          "ma50": 171.50019999999998,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": -0.043848345366341766
+        },
+        "order_flow": {
+          "buy_volume": 0,
+          "sell_volume": 0,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": 0
+        },
+        "overall_signal": "WAIT",
+        "spread_volatility": {
+          "avg_spread": 10.6,
+          "signal": true,
+          "status": "WIDENING",
+          "value": 22.641509433962266
+        },
+        "transaction_cost": {
+          "signal": true,
+          "spread_cost": 6.5,
+          "status": "ACCEPTABLE",
+          "swap_cost": 0.096,
+          "value": 6.596
+        }
+      },
+      "seconds_ago": 78095.118238,
       "sell_volume": 0,
       "spread": 13.0,
       "symbol": "ORCL",
       "volume": 0
     },
     {
-      "ask": 174.48,
-      "bid": 174.43,
+      "ask": 162.54,
+      "bid": 162.47,
       "buy_volume": 0,
-      "last_updated": "2026-01-16 19:45:04.66+01",
-      "seconds_ago": -7183.258474,
+      "last_updated": "2026-01-21 20:08:46.471+01",
+      "renaissance": {
+        "hmm_regime": {
+          "signal": false,
+          "status": "NEUTRAL",
+          "trend_pct": -0.09328914287681386,
+          "value": "NEUTRAL"
+        },
+        "kelly_size": {
+          "kelly_pct": 1.9812499999999924,
+          "signal": true,
+          "status": "SAFE",
+          "value": 19.812499999999925
+        },
+        "mean_reversion": {
+          "ma50": 162.39380000000003,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": 0.06847552061714683
+        },
+        "order_flow": {
+          "buy_volume": 0,
+          "sell_volume": 0,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": 0
+        },
+        "overall_signal": "WAIT",
+        "spread_volatility": {
+          "avg_spread": 5.4,
+          "signal": true,
+          "status": "WIDENING",
+          "value": 29.629629629629623
+        },
+        "transaction_cost": {
+          "signal": true,
+          "spread_cost": 3.5,
+          "status": "ACCEPTABLE",
+          "swap_cost": 0.096,
+          "value": 3.596
+        }
+      },
+      "seconds_ago": 78094.455238,
       "sell_volume": 0,
-      "spread": 5.0,
+      "spread": 7.0,
       "symbol": "PLTR",
       "volume": 0
     },
     {
-      "ask": 59.89,
-      "bid": 59.86,
+      "ask": 60.572,
+      "bid": 60.552,
       "buy_volume": 0,
-      "last_updated": "2026-01-16 19:45:04.852+01",
-      "seconds_ago": -7183.450474,
+      "last_updated": "2026-01-21 20:08:31.847+01",
+      "renaissance": {
+        "hmm_regime": {
+          "signal": false,
+          "status": "NEUTRAL",
+          "trend_pct": 0.005282925419915519,
+          "value": "NEUTRAL"
+        },
+        "kelly_size": {
+          "kelly_pct": 1.9812499999999924,
+          "signal": true,
+          "status": "SAFE",
+          "value": 19.812499999999925
+        },
+        "mean_reversion": {
+          "ma50": 60.56960000000003,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": -0.01254754860529378
+        },
+        "order_flow": {
+          "buy_volume": 0,
+          "sell_volume": 0,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": 0
+        },
+        "overall_signal": "WAIT",
+        "spread_volatility": {
+          "avg_spread": 22.9,
+          "signal": false,
+          "status": "NORMAL",
+          "value": -12.663755458515277
+        },
+        "transaction_cost": {
+          "signal": false,
+          "spread_cost": 10.0,
+          "status": "HIGH_COST",
+          "swap_cost": 0.096,
+          "value": 10.096
+        }
+      },
+      "seconds_ago": 78109.079238,
       "sell_volume": 0,
-      "spread": 30.0,
+      "spread": 20.0,
       "symbol": "SpotCrude",
       "volume": 0
     },
     {
-      "ask": 439.07,
-      "bid": 438.93,
+      "ask": 421.36,
+      "bid": 421.28,
       "buy_volume": 0,
-      "last_updated": "2026-01-16 19:45:03.589+01",
-      "seconds_ago": -7182.187474,
+      "last_updated": "2026-01-21 20:08:46.442+01",
+      "renaissance": {
+        "hmm_regime": {
+          "signal": false,
+          "status": "NEUTRAL",
+          "trend_pct": -0.07860023805188135,
+          "value": "NEUTRAL"
+        },
+        "kelly_size": {
+          "kelly_pct": 1.9812499999999924,
+          "signal": true,
+          "status": "SAFE",
+          "value": 19.812499999999925
+        },
+        "mean_reversion": {
+          "ma50": 421.4062000000001,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": -0.020455323153796275
+        },
+        "order_flow": {
+          "buy_volume": 0,
+          "sell_volume": 0,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": 0
+        },
+        "overall_signal": "WAIT",
+        "spread_volatility": {
+          "avg_spread": 10.65,
+          "signal": false,
+          "status": "TIGHTENING",
+          "value": -24.882629107981224
+        },
+        "transaction_cost": {
+          "signal": true,
+          "spread_cost": 4.0,
+          "status": "ACCEPTABLE",
+          "swap_cost": 0.096,
+          "value": 4.096
+        }
+      },
+      "seconds_ago": 78094.484238,
       "sell_volume": 0,
-      "spread": 14.0,
+      "spread": 8.0,
       "symbol": "TSLA",
       "volume": 0
     },
     {
-      "ask": 16.18,
-      "bid": 16.02,
+      "ask": 17.89,
+      "bid": 17.73,
       "buy_volume": 0,
-      "last_updated": "2026-01-16 19:44:27.027+01",
-      "seconds_ago": -7145.625474,
+      "last_updated": "2026-01-21 20:08:32.995+01",
+      "renaissance": {
+        "hmm_regime": {
+          "signal": true,
+          "status": "BULLISH",
+          "trend_pct": 0.7775397814388865,
+          "value": "BULLISH"
+        },
+        "kelly_size": {
+          "kelly_pct": 1.9812499999999924,
+          "signal": true,
+          "status": "SAFE",
+          "value": 19.812499999999925
+        },
+        "mean_reversion": {
+          "ma50": 17.5872,
+          "signal": false,
+          "status": "SELL_ZONE",
+          "value": 1.2668304221251991
+        },
+        "order_flow": {
+          "buy_volume": 0,
+          "sell_volume": 0,
+          "signal": false,
+          "status": "NEUTRAL",
+          "value": 0
+        },
+        "overall_signal": "WAIT",
+        "spread_volatility": {
+          "avg_spread": 16.22,
+          "signal": false,
+          "status": "NORMAL",
+          "value": -1.3563501849568365
+        },
+        "transaction_cost": {
+          "signal": true,
+          "spread_cost": 8.0,
+          "status": "ACCEPTABLE",
+          "swap_cost": 0.096,
+          "value": 8.096
+        }
+      },
+      "seconds_ago": 78107.931238,
       "sell_volume": 0,
       "spread": 16.0,
       "symbol": "VIX",
       "volume": 0
     }
   ],
-  "timestamp": 1768581909,
+  "timestamp": 1769100606,
   "total_assets": 17,
-  "update_count": 4032
+  "update_count": 243193
 }
