@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+
+# Node
+node_modules/
+
+# Editor / IDE
+.vs/
+
+# Local data / scratch
+*.csv
+last_ticker.txt
