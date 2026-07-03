@@ -1,0 +1,1424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>KLDA-HFT | Renaissance Terminal</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:    #080b0f;
+  --bg2:   #0d1117;
+  --bg3:   #111820;
+  --bg4:   #161e28;
+  --line:  #1c2733;
+  --line2: #243040;
+  --blue:  #00b4d8;
+  --green: #00e676;
+  --red:   #ff3d57;
+  --yel:   #ffc300;
+  --pur:   #bb86fc;
+  --txt:   #c5d5e8;
+  --txt2:  #4a6080;
+  --txt3:  #8099b8;
+  --hdr:   48px;
+  --alert: 0px;
+  --sb:    200px;
+}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--txt);font:12px/1.5 'Courier New',monospace}
+
+/* ── LOGIN OVERLAY ── */
+#login-overlay{
+  position:fixed;inset:0;background:rgba(8,11,15,.97);
+  display:flex;align-items:center;justify-content:center;
+  z-index:2000;flex-direction:column;
+}
+#login-overlay.hidden{display:none}
+#login-box{
+  background:var(--bg2);border:1px solid var(--line2);
+  padding:40px 48px;width:380px;border-radius:3px;
+}
+.login-logo{font-size:20px;font-weight:700;color:var(--blue);letter-spacing:4px;text-align:center;margin-bottom:4px}
+.login-sub{font-size:9px;color:var(--txt2);text-align:center;letter-spacing:2px;margin-bottom:32px}
+.login-lbl{font-size:9px;color:var(--txt2);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px}
+.login-inp{
+  width:100%;background:var(--bg3);border:1px solid var(--line);
+  color:var(--txt);padding:8px 12px;font:12px 'Courier New',monospace;
+  outline:none;border-radius:2px;margin-bottom:16px;
+}
+.login-inp:focus{border-color:var(--blue)}
+.login-btn{
+  width:100%;background:var(--blue);color:#000;padding:10px;
+  border:none;font:700 12px 'Courier New',monospace;cursor:pointer;
+  letter-spacing:2px;border-radius:2px;margin-top:4px;
+}
+.login-btn:hover{background:#00d4f5}
+.login-err{color:var(--red);font-size:10px;text-align:center;margin-top:12px;min-height:16px}
+.login-note{font-size:9px;color:var(--txt2);text-align:center;margin-top:20px;letter-spacing:.5px;line-height:1.8}
+
+/* ── USER BADGE + LOGOUT ── */
+.user-badge{display:flex;align-items:center;gap:6px;padding:3px 8px;background:var(--bg3);border:1px solid var(--line);border-radius:2px}
+.user-name{font-size:10px;color:var(--txt)}
+.role-pill{font-size:8px;padding:1px 6px;border-radius:8px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap}
+.role-admin{background:#2d0060;color:#bb86fc}
+.role-trader{background:#001a0a;color:var(--green)}
+.role-viewer{background:#001525;color:var(--blue)}
+.role-risk_manager{background:#1a1000;color:var(--yel)}
+.logout-btn{
+  padding:3px 10px;font:10px 'Courier New',monospace;cursor:pointer;
+  background:transparent;border:1px solid var(--line);color:var(--txt2);
+  letter-spacing:1px;border-radius:2px;
+}
+.logout-btn:hover{border-color:var(--red);color:var(--red)}
+
+/* ── ALERT BAR ── */
+#alert-bar{
+  display:none;position:fixed;top:0;left:0;right:0;
+  background:#2a0010;border-bottom:1px solid var(--red);
+  padding:6px 16px;font-size:11px;color:var(--red);
+  text-align:center;z-index:200;letter-spacing:.5px;
+}
+#alert-bar.show{display:block}
+
+/* ── HEADER ── */
+#hdr{
+  position:fixed;top:var(--alert);left:0;right:0;height:var(--hdr);
+  background:var(--bg2);border-bottom:2px solid var(--line);
+  display:flex;align-items:center;z-index:100;padding:0 12px;gap:0;
+}
+.logo-block{display:flex;flex-direction:column;padding-right:16px;border-right:1px solid var(--line);margin-right:16px;min-width:120px}
+.logo-top{font-size:14px;font-weight:700;color:var(--blue);letter-spacing:3px}
+.logo-sub{font-size:8px;color:var(--txt2);letter-spacing:2px;margin-top:1px}
+
+.hmetric{display:flex;flex-direction:column;padding:0 14px;border-right:1px solid var(--line)}
+.hmetric:last-of-type{border-right:none}
+.hm-lbl{font-size:8px;color:var(--txt2);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
+.hm-val{font-size:13px;font-weight:700;color:var(--txt)}
+.hm-val.pos{color:var(--green)}
+.hm-val.neg{color:var(--red)}
+.hm-val.blue{color:var(--blue)}
+.hm-val.yel{color:var(--yel)}
+.hm-sub{font-size:9px;color:var(--txt2);margin-top:1px}
+
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.status-pill{display:flex;align-items:center;gap:5px;padding:3px 8px;background:var(--bg3);border:1px solid var(--line);border-radius:2px;font-size:10px}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--txt2)}
+.dot.on{background:var(--green);box-shadow:0 0 5px var(--green);animation:blink 2s infinite}
+.dot.off{background:var(--red)}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+#utc{font-size:10px;color:var(--txt2);padding-left:10px;border-left:1px solid var(--line)}
+
+/* ── LAYOUT ── */
+#layout{position:fixed;top:var(--hdr);left:0;right:0;bottom:0;display:flex}
+
+/* ── SIDEBAR ── */
+#sb{width:var(--sb);flex-shrink:0;background:var(--bg2);border-right:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden}
+#sb-search{padding:7px 8px;border-bottom:1px solid var(--line)}
+#sb-search input{width:100%;background:var(--bg3);border:1px solid var(--line);color:var(--txt);padding:4px 8px;font:11px 'Courier New',monospace;outline:none;border-radius:2px}
+#sb-search input:focus{border-color:var(--blue)}
+#sb-body{flex:1;overflow-y:auto}
+#sb-body::-webkit-scrollbar{width:3px}
+#sb-body::-webkit-scrollbar-thumb{background:var(--line)}
+
+.sg-hdr{padding:5px 8px;font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:var(--txt2);background:var(--bg3);display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);border-top:1px solid var(--line);position:sticky;top:0;z-index:1}
+.sg-hdr span{color:var(--txt3)}
+
+.sr{display:flex;align-items:center;padding:3px 8px;cursor:pointer;border-bottom:1px solid #0d131a;transition:background .1s}
+.sr:hover{background:var(--bg3)}
+.sr.active{background:#0a1e2e;border-left:2px solid var(--blue)}
+.sr-name{flex:1;font-size:10px;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sr-bid{font-size:10px;color:var(--txt3);width:60px;text-align:right;flex-shrink:0}
+.sr-dot{width:5px;height:5px;border-radius:50%;background:var(--txt2);margin-left:4px;flex-shrink:0}
+.sr-dot.live{background:var(--green)}
+.sr.up{animation:up .4s}
+.sr.dn{animation:dn .4s}
+@keyframes up{0%{background:#001a0a}100%{background:transparent}}
+@keyframes dn{0%{background:#1a0008}100%{background:transparent}}
+
+/* ── MAIN ── */
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+
+/* ── TABS ── */
+#tabs{height:36px;background:var(--bg2);border-bottom:1px solid var(--line);display:flex;align-items:flex-end;padding:0 8px;flex-shrink:0}
+.tab{padding:7px 16px;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--txt2);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:color .15s}
+.tab:hover{color:var(--txt)}
+.tab.on{color:var(--blue);border-bottom-color:var(--blue)}
+.badge{display:inline-block;background:var(--red);color:#fff;font-size:8px;padding:0 4px;border-radius:8px;margin-left:3px;vertical-align:middle}
+
+/* ── PANELS ── */
+#panels{flex:1;overflow:hidden;position:relative}
+.pnl{position:absolute;inset:0;display:none;overflow:hidden}
+.pnl.on{display:flex;flex-direction:column}
+
+/* ── SHARED TABLE ── */
+.tbl-wrap{flex:1;overflow-y:auto}
+.tbl-wrap::-webkit-scrollbar{width:4px}
+.tbl-wrap::-webkit-scrollbar-thumb{background:var(--line)}
+table{width:100%;border-collapse:collapse;font-size:11px}
+th{background:var(--bg3);color:var(--txt2);font-size:8px;text-transform:uppercase;letter-spacing:1px;padding:6px 10px;text-align:left;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:2;white-space:nowrap}
+td{padding:5px 10px;border-bottom:1px solid #0d1520;white-space:nowrap;vertical-align:middle}
+tr:hover td{background:#0a1220}
+.pos{color:var(--green)}.neg{color:var(--red)}.yel{color:var(--yel)}.blue{color:var(--blue)}
+.pill{padding:2px 7px;border-radius:2px;font-size:10px;font-weight:700}
+.pill-buy{background:#001a0a;color:var(--green)}
+.pill-sell{background:#1a0008;color:var(--red)}
+.pill-ok{background:#001525;color:var(--blue)}
+.pill-fail{background:#1a0008;color:var(--red)}
+.pill-pend{background:#1a1200;color:var(--yel)}
+.pill-exec{background:#001a0a;color:var(--green)}
+.empty{padding:40px;text-align:center;color:var(--txt2);font-size:12px}
+
+/* ══ LIVE FEED ══ */
+#pnl-live{flex-direction:row !important}
+#lf-left{width:260px;flex-shrink:0;display:flex;flex-direction:column;border-right:1px solid var(--line);overflow:hidden}
+#lf-right{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+#ekg-box{padding:10px;border-bottom:1px solid var(--line)}
+#ekg-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+#ekg-sym{font-size:12px;font-weight:700;color:var(--blue)}
+#ekg-px{font-size:20px;font-weight:700;color:var(--txt)}
+#ekg-info{font-size:9px;color:var(--txt2);margin-top:2px}
+canvas#ekg{width:100%;height:70px;display:block}
+#tick-hint{padding:6px 10px;font-size:9px;color:var(--txt2);border-bottom:1px solid var(--line)}
+#tick-tbl-wrap{flex:1;overflow-y:auto}
+#tick-tbl-wrap::-webkit-scrollbar{width:3px}
+#tick-tbl-wrap::-webkit-scrollbar-thumb{background:var(--line)}
+#tick-tbody tr.new{animation:newrow .5s}
+@keyframes newrow{0%{background:#002a1a}100%{background:transparent}}
+#bar-box{display:flex;flex-direction:column;overflow:hidden;height:100%}
+#bar-ctrls{padding:6px 10px;border-bottom:1px solid var(--line);display:flex;gap:4px;align-items:center;flex-shrink:0}
+.tf{padding:2px 8px;font-size:9px;background:var(--bg3);border:1px solid var(--line);color:var(--txt2);cursor:pointer;font-family:'Courier New',monospace;letter-spacing:1px}
+.tf:hover,.tf.on{background:#00141f;border-color:var(--blue);color:var(--blue)}
+#bar-info{margin-left:auto;font-size:9px;color:var(--txt2)}
+#bar-canvas{flex:1;width:100%;display:block}
+
+/* ══ POSITIONS ══ */
+#pos-bar{padding:8px 12px;background:var(--bg3);border-bottom:1px solid var(--line);display:flex;gap:20px;align-items:center;flex-shrink:0;flex-wrap:wrap}
+.ps{display:flex;gap:6px;align-items:baseline}
+.ps .lbl{font-size:9px;color:var(--txt2)}
+.ps .v{font-size:12px;font-weight:700}
+#ext-warn{margin-left:auto;font-size:10px;color:var(--yel);padding:3px 10px;border:1px solid var(--yel);border-radius:2px;background:#1a1000}
+
+/* ══ ACCOUNT ══ */
+#ac-cards{display:flex;gap:10px;padding:10px;border-bottom:1px solid var(--line);flex-shrink:0;flex-wrap:wrap}
+.ac-card{flex:1;min-width:160px;background:var(--bg3);border:1px solid var(--line);padding:12px 14px;border-radius:2px}
+.ac-lbl{font-size:8px;color:var(--txt2);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px}
+.ac-val{font-size:22px;font-weight:700;color:var(--txt)}
+.ac-val.pos{color:var(--green)}
+.ac-val.neg{color:var(--red)}
+.ac-val.blue{color:var(--blue)}
+.ac-sub{font-size:9px;color:var(--txt2);margin-top:3px}
+.ac-sub.neg{color:var(--red)}
+.ac-sub.pos{color:var(--green)}
+#ac-body{flex:1;display:flex;overflow:hidden;min-height:0}
+#ac-left{width:380px;flex-shrink:0;border-right:1px solid var(--line);display:flex;flex-direction:column;overflow:hidden}
+#ac-right{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.sec-hdr{padding:7px 10px;font-size:8px;text-transform:uppercase;letter-spacing:1.5px;color:var(--txt2);background:var(--bg3);border-bottom:1px solid var(--line);flex-shrink:0;display:flex;justify-content:space-between;align-items:center}
+.sec-hdr .tf-grp{display:flex;gap:3px}
+#eq-canvas-wrap{flex:1;position:relative;overflow:hidden;min-height:0}
+canvas#eq{position:absolute;inset:0;width:100%;height:100%}
+#tx-wrap{height:140px;overflow-y:auto;flex-shrink:0;border-top:1px solid var(--line)}
+#tx-wrap::-webkit-scrollbar{width:3px}
+#tx-wrap::-webkit-scrollbar-thumb{background:var(--line)}
+#risk-bar{padding:6px 14px;background:#0f0800;border-bottom:1px solid #2a1800;font-size:10px;color:var(--yel);display:flex;align-items:center;gap:8px;flex-shrink:0}
+#risk-bar.danger{background:#1a0005;border-bottom-color:#4a0010;color:var(--red)}
+#risk-bar .risk-lbl{font-weight:700;letter-spacing:1px}
+
+/* ══ COMPLIANCE ══ */
+#pnl-compliance .sect-body{flex:1;display:none;flex-direction:column;overflow:hidden}
+#pnl-compliance .sect-body.on{display:flex}
+.comp-bar{padding:7px 10px;background:var(--bg3);border-bottom:1px solid var(--line);display:flex;gap:6px;align-items:center;flex-shrink:0;flex-wrap:wrap}
+.comp-date{background:var(--bg3);border:1px solid var(--line);color:var(--txt2);padding:3px 7px;font:9px 'Courier New',monospace;outline:none}
+.comp-date:focus{border-color:var(--blue)}
+.aum-display{display:flex;gap:6px;align-items:baseline;padding:8px 12px;background:var(--bg3);border-bottom:1px solid var(--line);flex-shrink:0}
+
+/* ══ ADMIN ══ */
+#admin-users{flex:1;display:flex;flex-direction:column;overflow:hidden}
+#admin-system{flex:1;display:none;flex-direction:column;overflow:hidden;padding:20px}
+#sys-status{font-size:11px;line-height:2.2;color:var(--txt2)}
+#sys-status span.val{color:var(--blue)}
+#create-user-modal{display:none;position:absolute;inset:0;background:rgba(8,11,15,.92);align-items:center;justify-content:center;z-index:10}
+.modal-box{background:var(--bg2);border:1px solid var(--line2);padding:32px;width:340px;border-radius:3px}
+.modal-title{font-size:11px;font-weight:700;color:var(--blue);letter-spacing:2px;margin-bottom:20px}
+.modal-row{display:flex;gap:8px;margin-top:8px}
+</style>
+</head>
+<body>
+
+<!-- ── LOGIN OVERLAY ── -->
+<div id="login-overlay">
+  <div id="login-box">
+    <div class="login-logo">KLDA&#8209;HFT</div>
+    <div class="login-sub">RENAISSANCE ENGINE &middot; SECURE ACCESS</div>
+    <div class="login-lbl">Username</div>
+    <input class="login-inp" id="l-user" type="text" placeholder="username" autocomplete="username">
+    <div class="login-lbl">Password</div>
+    <input class="login-inp" id="l-pass" type="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" autocomplete="current-password">
+    <button class="login-btn" onclick="doLogin()">AUTHENTICATE</button>
+    <div class="login-err" id="l-err"></div>
+    <div class="login-note">KLDA FinTech &mdash; Compliance-Grade Platform<br>All access is logged and audited for regulatory review</div>
+  </div>
+</div>
+
+<!-- ALERT BAR -->
+<div id="alert-bar"></div>
+
+<!-- HEADER -->
+<div id="hdr">
+  <div class="logo-block">
+    <div class="logo-top">KLDA&#8209;HFT</div>
+    <div class="logo-sub">RENAISSANCE ENGINE</div>
+  </div>
+
+  <div class="hmetric">
+    <div class="hm-lbl">Account</div>
+    <div class="hm-val blue" id="h-login">—</div>
+    <div class="hm-sub" id="h-server">—</div>
+  </div>
+  <div class="hmetric">
+    <div class="hm-lbl">Balance</div>
+    <div class="hm-val" id="h-bal">$0.00</div>
+    <div class="hm-sub">Cash available</div>
+  </div>
+  <div class="hmetric">
+    <div class="hm-lbl">Equity</div>
+    <div class="hm-val" id="h-eq">$0.00</div>
+    <div class="hm-sub">Balance + open P&amp;L</div>
+  </div>
+  <div class="hmetric">
+    <div class="hm-lbl">Open P&amp;L</div>
+    <div class="hm-val" id="h-float">$0.00</div>
+    <div class="hm-sub">Unrealized</div>
+  </div>
+  <div class="hmetric">
+    <div class="hm-lbl">Margin Level</div>
+    <div class="hm-val" id="h-margin">—</div>
+    <div class="hm-sub">Min 100% = call</div>
+  </div>
+  <div class="hmetric">
+    <div class="hm-lbl">Today P&amp;L</div>
+    <div class="hm-val" id="h-today">+$0.00</div>
+    <div class="hm-sub" id="h-today-sub">0 trades</div>
+  </div>
+  <div class="hmetric">
+    <div class="hm-lbl">Win Rate</div>
+    <div class="hm-val" id="h-wr">0%</div>
+    <div class="hm-sub">Today</div>
+  </div>
+
+  <div class="hdr-right">
+    <div class="status-pill">
+      <div class="dot" id="d-engine"></div>
+      <span id="l-engine" style="color:var(--txt2)">ENGINE</span>
+    </div>
+    <div class="status-pill">
+      <div class="dot" id="d-mt5"></div>
+      <span id="l-mt5" style="color:var(--txt2)">MT5</span>
+    </div>
+    <!-- User badge (shown after login) -->
+    <div class="user-badge" id="user-badge" style="display:none">
+      <span class="user-name" id="u-name"></span>
+      <span class="role-pill" id="u-role"></span>
+    </div>
+    <button class="logout-btn" id="logout-btn" onclick="doLogout()" style="display:none">LOGOUT</button>
+    <div id="utc">—</div>
+  </div>
+</div>
+
+<!-- LAYOUT -->
+<div id="layout">
+
+  <!-- SIDEBAR -->
+  <div id="sb">
+    <div id="sb-search"><input id="sym-q" placeholder="Search symbol..." oninput="filterSb(this.value)"></div>
+    <div id="sb-body"></div>
+  </div>
+
+  <!-- MAIN -->
+  <div id="main">
+
+    <!-- TABS -->
+    <div id="tabs">
+      <div class="tab on"  id="tab-live"        onclick="goTab('live')">Live Feed</div>
+      <div class="tab"     id="tab-positions"   onclick="goTab('positions')">Positions <span class="badge" id="b-pos">0</span></div>
+      <div class="tab"     id="tab-history"     onclick="goTab('history')">History</div>
+      <div class="tab"     id="tab-signals"     onclick="goTab('signals')">Signals <span class="badge" id="b-sig">0</span></div>
+      <div class="tab"     id="tab-account"     onclick="goTab('account')">Account</div>
+      <div class="tab"     id="tab-compliance"  onclick="goTab('compliance')" style="display:none">Compliance</div>
+      <div class="tab"     id="tab-admin"       onclick="goTab('admin')" style="display:none">Admin</div>
+    </div>
+
+    <!-- PANELS -->
+    <div id="panels">
+
+      <!-- ══ LIVE FEED ══ -->
+      <div class="pnl on" id="pnl-live">
+        <div id="lf-left">
+          <div id="ekg-box">
+            <div id="ekg-top">
+              <div>
+                <div id="ekg-sym">&#9656; Select a symbol</div>
+                <div id="ekg-info">Click any symbol in the sidebar</div>
+              </div>
+              <div id="ekg-px">—</div>
+            </div>
+            <canvas id="ekg" height="70"></canvas>
+          </div>
+          <div id="tick-hint">Raw tick stream — newest on top</div>
+          <div id="tick-tbl-wrap">
+            <table>
+              <thead><tr><th>Time</th><th>Bid</th><th>Ask</th><th>Spread</th><th>Vol</th></tr></thead>
+              <tbody id="tick-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+        <div id="bar-box">
+          <div id="bar-ctrls">
+            <span style="font-size:9px;color:var(--txt2);margin-right:4px">TIMEFRAME</span>
+            <div class="tf on" onclick="setTF('M1')">M1</div>
+            <div class="tf" onclick="setTF('M5')">M5</div>
+            <div class="tf" onclick="setTF('M15')">M15</div>
+            <div class="tf" onclick="setTF('H1')">H1</div>
+            <div class="tf" onclick="setTF('H4')">H4</div>
+            <div class="tf" onclick="setTF('D1')">D1</div>
+            <div id="bar-info"></div>
+          </div>
+          <canvas id="bar-canvas"></canvas>
+        </div>
+      </div>
+
+      <!-- ══ POSITIONS ══ -->
+      <div class="pnl" id="pnl-positions">
+        <div id="pos-bar">
+          <div class="ps"><span class="lbl">Our Positions:</span> <span class="v" id="ps-n">0</span></div>
+          <div class="ps"><span class="lbl">Our Floating P&amp;L:</span> <span class="v" id="ps-fl">$0.00</span></div>
+          <div class="ps"><span class="lbl">Total Lots:</span> <span class="v" id="ps-lots">0.00</span></div>
+          <div id="ext-warn" style="display:none" id="pos-ext"></div>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Ticket</th><th>Symbol</th><th>Type</th><th>Lots</th><th>Open Price</th><th>Current Price</th><th>Open P&amp;L</th><th>Open Time</th><th>Comment</th></tr></thead>
+            <tbody id="pos-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══ HISTORY ══ -->
+      <div class="pnl" id="pnl-history">
+        <div style="background:var(--bg3);border-bottom:1px solid var(--line);padding:8px 12px;display:flex;gap:20px;align-items:center;flex-shrink:0">
+          <div class="ps"><span class="lbl">Total Closed Trades:</span> <span class="v" id="ht-n">—</span></div>
+          <div class="ps"><span class="lbl">Win Rate:</span> <span class="v pos" id="ht-wr">—</span></div>
+          <div class="ps"><span class="lbl">Net P&amp;L:</span> <span class="v" id="ht-net">—</span></div>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Ticket</th><th>Symbol</th><th>Type</th><th>Lots</th><th>Open</th><th>Close</th><th>Open Time</th><th>Close Time</th><th>Gross P&amp;L</th><th>Commission</th><th>Net P&amp;L</th></tr></thead>
+            <tbody id="hist-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══ SIGNALS ══ -->
+      <div class="pnl" id="pnl-signals">
+        <div style="padding:7px 10px;background:var(--bg3);border-bottom:1px solid var(--line);display:flex;gap:6px;flex-shrink:0;align-items:center">
+          <span style="font-size:9px;color:var(--txt2);margin-right:4px">FILTER:</span>
+          <div class="tf on" onclick="sigFilter('ALL',this)">ALL</div>
+          <div class="tf" onclick="sigFilter('PENDING',this)">PENDING</div>
+          <div class="tf" onclick="sigFilter('EXECUTED',this)">EXECUTED</div>
+          <div class="tf" onclick="sigFilter('FAILED',this)">FAILED</div>
+          <span style="margin-left:auto;font-size:9px;color:var(--txt2)">C++ engine generates signals when all 5 Renaissance metrics pass</span>
+        </div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>#</th><th>Time</th><th>Symbol</th><th>Direction</th><th>Price</th><th>Confidence</th><th>Kelly %</th><th>Pattern</th><th>Status</th></tr></thead>
+            <tbody id="sig-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ══ ACCOUNT ══ -->
+      <div class="pnl" id="pnl-account">
+        <div id="risk-bar" style="display:none">
+          <span class="risk-lbl" id="risk-lbl">MARGIN ALERT</span>
+          <span id="risk-msg"></span>
+        </div>
+        <div id="ac-cards">
+          <div class="ac-card">
+            <div class="ac-lbl">Cash Balance</div>
+            <div class="ac-val blue" id="ac-bal">$0.00</div>
+            <div class="ac-sub" id="ac-srv">Pepperstone Live</div>
+          </div>
+          <div class="ac-card">
+            <div class="ac-lbl">Equity</div>
+            <div class="ac-val" id="ac-eq">$0.00</div>
+            <div class="ac-sub">Balance + all open P&amp;L</div>
+          </div>
+          <div class="ac-card">
+            <div class="ac-lbl">Open P&amp;L (floating)</div>
+            <div class="ac-val" id="ac-fl">$0.00</div>
+            <div class="ac-sub">Unrealized from open positions</div>
+          </div>
+          <div class="ac-card">
+            <div class="ac-lbl">Free Margin</div>
+            <div class="ac-val" id="ac-fm">$0.00</div>
+            <div class="ac-sub" id="ac-ml">Margin Level: 0%</div>
+          </div>
+          <div class="ac-card">
+            <div class="ac-lbl">Today Net P&amp;L</div>
+            <div class="ac-val" id="ac-tp">$0.00</div>
+            <div class="ac-sub" id="ac-td">0 trades | Win: 0%</div>
+          </div>
+          <div class="ac-card">
+            <div class="ac-lbl">Lifetime Net P&amp;L</div>
+            <div class="ac-val" id="ac-lp">$0.00</div>
+            <div class="ac-sub" id="ac-lt">All time from our system</div>
+          </div>
+        </div>
+        <div id="ac-body">
+          <div id="ac-left">
+            <div class="sec-hdr">Daily P&amp;L — Last 30 Days</div>
+            <div class="tbl-wrap">
+              <table>
+                <thead><tr><th>Date</th><th>Trades</th><th>Won</th><th>Lost</th><th>Net P&amp;L</th><th>Win %</th><th>Balance EOD</th></tr></thead>
+                <tbody id="daily-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+          <div id="ac-right">
+            <div class="sec-hdr">
+              Equity Curve
+              <div class="tf-grp">
+                <div class="tf" onclick="setEqPeriod(1,this)">1D</div>
+                <div class="tf on" onclick="setEqPeriod(7,this)">7D</div>
+                <div class="tf" onclick="setEqPeriod(30,this)">30D</div>
+              </div>
+            </div>
+            <div id="eq-canvas-wrap"><canvas id="eq"></canvas></div>
+            <div class="sec-hdr" style="margin-top:0;border-top:1px solid var(--line)">Transactions — Deposits &amp; Withdrawals</div>
+            <div id="tx-wrap">
+              <table>
+                <thead><tr><th>Time</th><th>Type</th><th>Amount</th><th>Balance After</th><th>Note</th></tr></thead>
+                <tbody id="tx-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ COMPLIANCE ══ -->
+      <div class="pnl" id="pnl-compliance">
+        <div class="comp-bar">
+          <span style="font-size:9px;color:var(--txt2);margin-right:4px">SECTION:</span>
+          <span id="comp-sect-tabs" style="display:flex;gap:4px">
+            <div class="tf on" onclick="compSection('audit',this)">AUDIT LOG</div>
+            <div class="tf" onclick="compSection('ledger',this)">INVESTOR LEDGER</div>
+            <div class="tf" onclick="compSection('nav',this)">NAV HISTORY</div>
+          </span>
+          <div style="margin-left:auto;display:flex;gap:6px;align-items:center">
+            <span style="font-size:9px;color:var(--txt2)">EXPORT RANGE:</span>
+            <input type="date" id="exp-from" class="comp-date">
+            <span style="font-size:9px;color:var(--txt2)">to</span>
+            <input type="date" id="exp-to" class="comp-date">
+            <div class="tf" onclick="exportReport()">EXPORT JSON</div>
+          </div>
+        </div>
+
+        <!-- Audit Log section -->
+        <div class="sect-body on" id="sect-audit">
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Timestamp</th><th>User</th><th>Role</th><th>Action</th><th>Resource</th><th>IP</th><th>Result</th></tr></thead>
+              <tbody id="audit-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Investor Ledger section -->
+        <div class="sect-body" id="sect-ledger">
+          <div class="aum-display">
+            <span style="font-size:9px;color:var(--txt2)">TOTAL NET AUM:</span>
+            <span class="v blue" id="comp-aum">$0.00</span>
+          </div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Time</th><th>Investor</th><th>Type</th><th>Amount USD</th><th>NAV at Entry</th><th>Shares Delta</th><th>Reference</th></tr></thead>
+              <tbody id="ledger-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- NAV History section -->
+        <div class="sect-body" id="sect-nav">
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Date</th><th>AUM</th><th>Shares</th><th>NAV/Share</th><th>Gross P&amp;L</th><th>Net P&amp;L</th><th>Mgmt Fee</th><th>Perf Fee</th><th>Status</th></tr></thead>
+              <tbody id="nav-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ ADMIN ══ -->
+      <div class="pnl" id="pnl-admin" style="position:relative">
+        <div class="comp-bar">
+          <span style="font-size:9px;color:var(--txt2);margin-right:4px">SECTION:</span>
+          <span id="admin-sect-tabs" style="display:flex;gap:4px">
+            <div class="tf on" onclick="adminSection('users',this)">USER MANAGEMENT</div>
+            <div class="tf" onclick="adminSection('system',this)">SYSTEM STATUS</div>
+          </span>
+          <div style="margin-left:auto">
+            <div class="tf" onclick="showCreateUser()">+ NEW USER</div>
+          </div>
+        </div>
+
+        <!-- Users table -->
+        <div id="admin-users">
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>ID</th><th>Username</th><th>Email</th><th>Role</th><th>Status</th><th>Last Login</th><th>Actions</th></tr></thead>
+              <tbody id="users-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- System status -->
+        <div id="admin-system">
+          <div id="sys-status">Loading system status...</div>
+        </div>
+
+        <!-- Create user modal -->
+        <div id="create-user-modal">
+          <div class="modal-box">
+            <div class="modal-title">CREATE USER</div>
+            <div class="login-lbl">Username</div>
+            <input class="login-inp" id="nu-user" type="text" placeholder="username" autocomplete="off">
+            <div class="login-lbl">Email</div>
+            <input class="login-inp" id="nu-email" type="email" placeholder="user@klda.fund" autocomplete="off">
+            <div class="login-lbl">Password</div>
+            <input class="login-inp" id="nu-pass" type="password" placeholder="&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;" autocomplete="new-password">
+            <div class="login-lbl">Role</div>
+            <select id="nu-role" class="login-inp" style="padding:6px 8px">
+              <option value="viewer">Viewer</option>
+              <option value="trader">Trader</option>
+              <option value="risk_manager">Risk Manager</option>
+              <option value="admin">Admin</option>
+            </select>
+            <div class="modal-row">
+              <button class="login-btn" onclick="createUser()">CREATE</button>
+              <button class="login-btn" style="background:var(--bg3);color:var(--txt);border:1px solid var(--line)" onclick="hideCreateUser()">CANCEL</button>
+            </div>
+            <div class="login-err" id="cu-err"></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /panels -->
+  </div><!-- /main -->
+</div><!-- /layout -->
+
+<script>
+const API  = 'http://localhost:5002';
+const SYMS = {
+  'Stocks':['AAPL.US-24','AMD.US-24','AMZN.US-24','AVGO.US-24','CSCO.US-24','GOOG.US-24','INTC.US-24','META.US-24','MSFT.US-24','NVDA.US-24','ORCL.US-24','PLTR.US-24','TSLA.US-24'],
+  'Indices':['NAS100','US500','US30','UK100','GER40','JPN225','FRA40','AUS200','HK50','CN50','EUSTX50','VIX','USDX','EURX','JPYX','US2000'],
+  'Commodities':['SpotCrude','SpotBrent','NatGas','XAUUSD','XAGUSD','XPTUSD','XPDUSD','Copper','Gasoline','Corn','Wheat','Soybeans','Coffee','Cotton','Sugar'],
+  'Forex':['EURUSD','GBPUSD','USDJPY','USDCAD','AUDUSD','NZDUSD','USDCHF','USDCNH','EURGBP','EURJPY','GBPJPY','AUDJPY','EURAUD','GBPAUD','CADJPY','CHFJPY','EURCAD','GBPCAD','USDMXN','USDZAR']
+};
+
+let tab='live', sym=null, tf='M1', _eqDays=7, _sigF='ALL';
+let lastTick=0, ekgPx=[], bars=[], prices={};
+let currentUser=null, intervalsStarted=false;
+
+// ── UTILS ──
+const $=id=>document.getElementById(id);
+function fmt(v,d=2){return parseFloat(v||0).toFixed(d)}
+function fmtM(v){return '$'+Math.abs(+v||0).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2})}
+function fmtS(v){return ((+v||0)>=0?'+':'')+fmtM(v).replace('$',(+v||0)>=0?'$':'-$')}
+function sid(s){return s.replace(/[^a-zA-Z0-9]/g,'_')}
+function dec(s){
+  if(!s)return 2; s=s.toUpperCase();
+  if(s.includes('JPY'))return 3;
+  if(s.includes('XAU')||s.includes('XAG'))return 2;
+  if(s.includes('NAS')||s.includes('US5')||s.includes('US30'))return 1;
+  if(s.includes('.US'))return 2;
+  if(s.includes('USD')||s.includes('EUR')||s.includes('GBP'))return 5;
+  return 4;
+}
+function fmtP(s,v){return parseFloat(v||0).toFixed(dec(s))}
+function fmtT(iso){
+  if(!iso)return'—';
+  try{return new Date(iso).toISOString().replace('T',' ').slice(0,19)}catch{return iso}
+}
+function colorSet(el,v){
+  el.className=el.className.replace(/\bpos\b|\bneg\b|\byel\b|\bblue\b/g,'').trim();
+  el.classList.add((+v||0)>=0?'pos':'neg');
+  el.textContent=fmtS(v);
+}
+function setV(id,txt,cls){const e=$(id);if(!e)return;e.textContent=txt;if(cls)e.className=e.className.replace(/\bpos\b|\bneg\b/g,'').trim(),e.classList.add(cls)}
+
+// ── AUTH: apiFetch ──
+async function apiFetch(url, opts={}) {
+  const token=localStorage.getItem('klda_token');
+  const headers=Object.assign({'Content-Type':'application/json'}, opts.headers||{});
+  if(token) headers['Authorization']='Bearer '+token;
+  const r=await fetch(url, Object.assign({}, opts, {headers}));
+  if(r.status===401){
+    showLogin('Session expired — please log in again');
+    throw new Error('Unauthorized');
+  }
+  return r;
+}
+
+// ── AUTH: Login / Logout ──
+function showLogin(msg=''){
+  $('login-overlay').classList.remove('hidden');
+  $('l-err').textContent=msg;
+  $('l-user').value=''; $('l-pass').value='';
+  setTimeout(()=>$('l-user').focus(),100);
+}
+function hideLogin(){$('login-overlay').classList.add('hidden')}
+
+async function doLogin(){
+  const username=$('l-user').value.trim();
+  const password=$('l-pass').value;
+  if(!username||!password){$('l-err').textContent='Enter username and password';return}
+  $('l-err').textContent='';
+  try{
+    const r=await fetch(API+'/api/login',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({username,password})
+    });
+    const d=await r.json();
+    if(!r.ok){$('l-err').textContent=d.error||'Login failed';return}
+    localStorage.setItem('klda_token',d.token);
+    currentUser=d.user;
+    onLoginSuccess();
+  }catch(e){
+    $('l-err').textContent='Server unreachable — check connection';
+  }
+}
+
+async function doLogout(){
+  try{await apiFetch(API+'/api/logout',{method:'POST'})}catch{}
+  localStorage.removeItem('klda_token');
+  currentUser=null;
+  $('user-badge').style.display='none';
+  $('logout-btn').style.display='none';
+  showLogin('Logged out successfully');
+}
+
+async function checkAuth(){
+  const token=localStorage.getItem('klda_token');
+  if(!token){showLogin();return}
+  try{
+    const r=await fetch(API+'/api/me',{headers:{'Authorization':'Bearer '+token}});
+    if(!r.ok){showLogin();return}
+    const d=await r.json();
+    currentUser=d;
+    onLoginSuccess();
+  }catch{
+    showLogin('Server unreachable — check connection');
+  }
+}
+
+function onLoginSuccess(){
+  hideLogin();
+  const u=currentUser;
+  $('u-name').textContent=u.username;
+  const rp=$('u-role');
+  rp.textContent=(u.role||'').replace('_',' ').toUpperCase();
+  rp.className='role-pill role-'+(u.role||'');
+  $('user-badge').style.display='flex';
+  $('logout-btn').style.display='block';
+  applyRoleGating(u.role);
+  if(!intervalsStarted){
+    start();
+  }else{
+    loadHeader(); loadSb();
+    goTab(tab);
+  }
+}
+
+// ── RBAC: role gating ──
+function applyRoleGating(role){
+  const tabRoles={
+    'live':       ['admin','trader','viewer','risk_manager'],
+    'positions':  ['admin','trader','viewer'],
+    'history':    ['admin','trader','viewer'],
+    'signals':    ['admin','trader'],
+    'account':    ['admin','trader','viewer','risk_manager'],
+    'compliance': ['admin','risk_manager'],
+    'admin':      ['admin'],
+  };
+  // Show/hide tabs
+  Object.entries(tabRoles).forEach(([t,roles])=>{
+    const el=$('tab-'+t);
+    if(el) el.style.display=roles.includes(role)?'':'none';
+  });
+  // Jump to first visible tab
+  const first=Object.entries(tabRoles).find(([,roles])=>roles.includes(role));
+  if(first) goTab(first[0]);
+}
+
+// ── TABS ──
+const TAB_IDS=['live','positions','history','signals','account','compliance','admin'];
+function goTab(t){
+  tab=t;
+  TAB_IDS.forEach(name=>{
+    const te=$('tab-'+name); if(te) te.classList.toggle('on', name===t);
+    const pe=$('pnl-'+name); if(pe) pe.classList.toggle('on', name===t);
+  });
+  if(t==='positions')  loadPositions();
+  if(t==='history')    loadHistory();
+  if(t==='signals')    loadSignals();
+  if(t==='account')    loadAccount();
+  if(t==='compliance') loadCompliance();
+  if(t==='admin')      loadAdmin();
+}
+
+// ── HEADER ──
+async function loadHeader(){
+  try{
+    const r=await apiFetch(API+'/api/account'); if(!r.ok)throw 0;
+    const d=await r.json(); if(d.error)throw 0;
+    $('h-login').textContent=d.login||'—';
+    $('h-server').textContent=d.server||'';
+    $('h-bal').textContent=fmtM(d.balance);
+    const eqEl=$('h-eq'); eqEl.textContent=fmtM(d.equity);
+    eqEl.className='hm-val '+(d.equity<d.balance?'neg':'pos');
+    colorSet($('h-float'),d.floating_pnl);
+    const ml=+d.margin_level||0;
+    const mEl=$('h-margin');
+    mEl.textContent=ml.toFixed(0)+'%';
+    mEl.className='hm-val '+(ml<150?'neg':ml<300?'yel':'pos');
+    colorSet($('h-today'),d.today.net_profit);
+    $('h-today-sub').textContent=d.today.trades+' trade'+(d.today.trades!==1?'s':'');
+    $('h-wr').textContent=(d.today.win_rate*100).toFixed(1)+'%';
+    if(ml>0&&ml<120){
+      $('alert-bar').className='show';
+      $('alert-bar').textContent='MARGIN ALERT — Level '+ml.toFixed(0)+'% is near margin call (100%). Close positions or deposit funds immediately.';
+    }else{
+      $('alert-bar').className='';
+    }
+    $('d-engine').className='dot on'; $('l-engine').style.color='var(--green)';
+    $('d-mt5').className=d.login?'dot on':'dot off';
+    $('l-mt5').style.color=d.login?'var(--green)':'var(--red)';
+  }catch(e){
+    if(e&&e.message==='Unauthorized')return;
+    $('d-engine').className='dot off'; $('l-engine').style.color='var(--red)';
+  }
+}
+
+// ── SIDEBAR ──
+function buildSb(){
+  const body=$('sb-body'); body.innerHTML='';
+  for(const[g,ss] of Object.entries(SYMS)){
+    const hdr=document.createElement('div');
+    hdr.className='sg-hdr';
+    hdr.innerHTML=g+'<span>'+ss.length+'</span>';
+    body.appendChild(hdr);
+    for(const s of ss){
+      const row=document.createElement('div');
+      row.className='sr'; row.id='sr-'+sid(s);
+      row.innerHTML=`<span class="sr-name">${s}</span><span class="sr-bid" id="sbid-${sid(s)}">—</span><div class="sr-dot" id="sdot-${sid(s)}"></div>`;
+      row.onclick=()=>selSym(s);
+      body.appendChild(row);
+    }
+  }
+}
+
+async function loadSb(){
+  try{
+    const r=await apiFetch(API+'/api/symbols'); if(!r.ok)return;
+    const d=await r.json();
+    for(const ss of Object.values(d)){
+      for(const s of ss){
+        const id=sid(s.symbol);
+        const bidEl=$('sbid-'+id), dotEl=$('sdot-'+id);
+        if(!bidEl)continue;
+        const prev=prices[s.symbol]||0;
+        if(s.bid>0){
+          bidEl.textContent=fmtP(s.symbol,s.bid);
+          dotEl.className='sr-dot live';
+          if(prev&&s.bid!==prev){
+            const row=$('sr-'+id);
+            if(row){row.classList.remove('up','dn');void row.offsetWidth;row.classList.add(s.bid>prev?'up':'dn')}
+          }
+          prices[s.symbol]=s.bid;
+        }else{
+          bidEl.textContent='—'; dotEl.className='sr-dot';
+        }
+      }
+    }
+  }catch(e){if(e&&e.message==='Unauthorized')return}
+}
+
+function filterSb(q){
+  q=q.toLowerCase();
+  document.querySelectorAll('.sr').forEach(r=>{
+    r.style.display=r.querySelector('.sr-name').textContent.toLowerCase().includes(q)?'':'none';
+  });
+}
+
+// ── SYMBOL SELECT ──
+function selSym(s){
+  if(sym){const p=$('sr-'+sid(sym));if(p)p.classList.remove('active')}
+  sym=s;
+  const r=$('sr-'+sid(s));if(r)r.classList.add('active');
+  $('ekg-sym').textContent='▶ '+s;
+  $('ekg-info').textContent='';
+  $('ekg-px').textContent='—';
+  $('tick-tbody').innerHTML='';
+  ekgPx=[];lastTick=0;
+  loadBars(s,tf);
+}
+
+// ── EKG + TICKS ──
+async function loadTicks(){
+  if(!sym)return;
+  try{
+    const url=lastTick>0?`${API}/api/ticks/${encodeURIComponent(sym)}?since=${lastTick}&limit=50`:`${API}/api/ticks/${encodeURIComponent(sym)}?limit=60`;
+    const r=await apiFetch(url); if(!r.ok)return;
+    const d=await r.json();
+    if(!d.ticks||!d.ticks.length)return;
+    const sorted=[...d.ticks].sort((a,b)=>a.time_ms-b.time_ms);
+    const tb=$('tick-tbody');
+    for(const t of sorted){
+      if(t.time_ms>lastTick)lastTick=t.time_ms;
+      ekgPx.push(t.bid);
+      if(ekgPx.length>400)ekgPx.shift();
+      $('ekg-px').textContent=fmtP(sym,t.bid);
+      $('ekg-info').textContent='Spread: '+fmt(t.spread,1)+' | Ask: '+fmtP(sym,t.ask);
+      const tr=document.createElement('tr');
+      tr.className='new';
+      tr.innerHTML=`<td style="color:var(--txt2)">${new Date(t.time_ms).toISOString().slice(11,23)}</td><td>${fmtP(sym,t.bid)}</td><td>${fmtP(sym,t.ask)}</td><td>${fmt(t.spread,1)}</td><td>${t.volume||0}</td>`;
+      tb.insertBefore(tr,tb.firstChild);
+    }
+    while(tb.children.length>200)tb.removeChild(tb.lastChild);
+    drawEKG();
+  }catch(e){if(e&&e.message==='Unauthorized')return}
+}
+
+function drawEKG(){
+  const c=$('ekg');
+  const W=c.offsetWidth;const H=70;
+  c.width=W;c.height=H;
+  const ctx=c.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+  if(ekgPx.length<2)return;
+  const mn=Math.min(...ekgPx),mx=Math.max(...ekgPx);
+  const rng=mx-mn||0.0001;
+  const p=5,step=W/(ekgPx.length-1);
+  ctx.beginPath();
+  ekgPx.forEach((v,i)=>{const x=i*step,y=p+((mx-v)/rng)*(H-p*2);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});
+  ctx.lineTo(W,H);ctx.lineTo(0,H);ctx.closePath();
+  const g=ctx.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'rgba(0,180,216,.25)');g.addColorStop(1,'rgba(0,180,216,0)');
+  ctx.fillStyle=g;ctx.fill();
+  ctx.beginPath();ctx.strokeStyle='#00b4d8';ctx.lineWidth=1.5;ctx.shadowColor='#00b4d8';ctx.shadowBlur=4;
+  ekgPx.forEach((v,i)=>{const x=i*step,y=p+((mx-v)/rng)*(H-p*2);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});
+  ctx.stroke();
+}
+
+// ── BAR CHART ──
+function setTF(t){
+  tf=t;
+  document.querySelectorAll('#bar-ctrls .tf').forEach(b=>b.classList.toggle('on',b.textContent===t));
+  if(sym)loadBars(sym,t);
+}
+
+async function loadBars(s,t){
+  try{
+    const r=await apiFetch(`${API}/api/bars/${encodeURIComponent(s)}?tf=${t}&limit=200`);
+    if(!r.ok){bars=[];drawBars();return}
+    const d=await r.json();
+    bars=d.bars||[];
+    $('bar-info').textContent=bars.length+' bars | '+t+' | '+s;
+    drawBars();
+  }catch(e){if(e&&e.message==='Unauthorized')return;bars=[];drawBars()}
+}
+
+function drawBars(){
+  const c=$('bar-canvas');
+  const W=c.parentElement.offsetWidth,H=c.parentElement.offsetHeight;
+  c.width=W;c.height=H;
+  const ctx=c.getContext('2d');
+  ctx.fillStyle='#080b0f';ctx.fillRect(0,0,W,H);
+  if(!bars.length||!sym){
+    ctx.fillStyle='#4a6080';ctx.font='12px Courier New';ctx.textAlign='center';
+    ctx.fillText(sym?'Loading bars...':'Select a symbol from the sidebar',W/2,H/2);
+    return;
+  }
+  const pd={t:12,b:22,l:65,r:10};
+  const cw=W-pd.l-pd.r,ch=H-pd.t-pd.b;
+  const lows=bars.map(b=>b.low),highs=bars.map(b=>b.high);
+  const mn=Math.min(...lows),mx=Math.max(...highs);
+  const rng=mx-mn||.001;
+  const bw=Math.max(1,cw/bars.length-1),xs=cw/bars.length;
+  ctx.strokeStyle='#161e28';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const y=pd.t+(i/4)*ch;
+    ctx.beginPath();ctx.moveTo(pd.l,y);ctx.lineTo(W-pd.r,y);ctx.stroke();
+    const p=mx-(i/4)*rng;
+    ctx.fillStyle='#4a6080';ctx.font='9px Courier New';ctx.textAlign='right';
+    ctx.fillText(p.toFixed(dec(sym)),pd.l-3,y+3);
+  }
+  bars.forEach((b,i)=>{
+    const x=pd.l+i*xs+xs/2;
+    const oY=pd.t+((mx-b.open)/rng)*ch,cY=pd.t+((mx-b.close)/rng)*ch;
+    const hY=pd.t+((mx-b.high)/rng)*ch,lY=pd.t+((mx-b.low)/rng)*ch;
+    const bull=b.close>=b.open;
+    ctx.strokeStyle=bull?'#00e676':'#ff3d57';
+    ctx.fillStyle=bull?'#001a0a':'#1a0008';
+    ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(x,hY);ctx.lineTo(x,lY);ctx.stroke();
+    const top=Math.min(oY,cY),ht=Math.max(1,Math.abs(oY-cY));
+    ctx.fillRect(x-bw/2,top,bw,ht);
+    ctx.strokeRect(x-bw/2,top,bw,ht);
+  });
+  const step=Math.max(1,Math.floor(bars.length/10));
+  ctx.fillStyle='#4a6080';ctx.font='8px Courier New';ctx.textAlign='center';
+  bars.forEach((b,i)=>{
+    if(i%step===0&&b.time){
+      const x=pd.l+i*xs+xs/2;
+      ctx.fillText(b.time.slice(5,16).replace('T',' '),x,H-4);
+    }
+  });
+}
+
+// ── POSITIONS ──
+async function loadPositions(){
+  try{
+    const r=await apiFetch(API+'/api/positions');
+    const d=await r.json();
+    const tb=$('pos-tbody');tb.innerHTML='';
+    let fl=0,lots=0;
+    for(const p of d){
+      fl+=p.profit;lots+=p.volume;
+      const pnlCls=p.profit>=0?'pos':'neg';
+      const typeCls=p.type==='BUY'?'pill-buy':'pill-sell';
+      tb.innerHTML+=`<tr><td style="color:var(--txt2)">${p.ticket||'—'}</td><td>${p.symbol}</td><td><span class="pill ${typeCls}">${p.type}</span></td><td>${fmt(p.volume,2)}</td><td>${fmtP(p.symbol,p.open_price)}</td><td>${fmtP(p.symbol,p.current_price)}</td><td class="${pnlCls}">${fmtS(p.profit)}</td><td style="color:var(--txt2)">${fmtT(p.open_time)}</td><td style="color:var(--txt2)">${p.comment||'—'}</td></tr>`;
+    }
+    if(!d.length){
+      try{
+        const acR=await apiFetch(API+'/api/account');
+        const ac=await acR.json();
+        if(Math.abs(ac.floating_pnl)>0.01){
+          tb.innerHTML=`<tr><td colspan="9" style="padding:20px;color:var(--yel);text-align:center">
+            No positions tracked by our system yet.<br><br>
+            MT5 account shows <strong style="color:var(--red)">${fmtS(ac.floating_pnl)}</strong> floating P&L from positions placed outside this system.<br>
+            When the C++ engine generates signals and our engine executes trades, they will appear here.
+          </td></tr>`;
+        }else{
+          tb.innerHTML='<tr><td colspan="9" class="empty">No open positions</td></tr>';
+        }
+      }catch{}
+    }
+    $('b-pos').textContent=d.length;
+    $('ps-n').textContent=d.length;
+    const flEl=$('ps-fl');colorSet(flEl,fl);
+    $('ps-lots').textContent=fmt(lots,2);
+  }catch(e){if(e&&e.message==='Unauthorized')return}
+}
+
+// ── HISTORY ──
+async function loadHistory(){
+  try{
+    const r=await apiFetch(API+'/api/trades?limit=200');
+    const d=await r.json();
+    const trades=d.trades||[];
+    const tb=$('hist-tbody');tb.innerHTML='';
+    if(!trades.length){tb.innerHTML='<tr><td colspan="11" class="empty">No closed trades yet — our system has not executed any trades</td></tr>';return}
+    let wins=0,net=0;
+    for(const t of trades){
+      if(t.net_profit>0)wins++;net+=t.net_profit;
+      const pc=t.net_profit>=0?'pos':'neg';
+      const tc=t.type==='BUY'?'pill-buy':'pill-sell';
+      tb.innerHTML+=`<tr><td style="color:var(--txt2)">${t.ticket||'—'}</td><td>${t.symbol}</td><td><span class="pill ${tc}">${t.type}</span></td><td>${fmt(t.volume,2)}</td><td>${fmtP(t.symbol,t.open_price)}</td><td>${fmtP(t.symbol,t.close_price)}</td><td style="color:var(--txt2)">${fmtT(t.open_time)}</td><td style="color:var(--txt2)">${fmtT(t.close_time)}</td><td class="${t.profit>=0?'pos':'neg'}">${fmtS(t.profit)}</td><td style="color:var(--txt2)">$${fmt(t.commission,2)}</td><td class="${pc}"><strong>${fmtS(t.net_profit)}</strong></td></tr>`;
+    }
+    $('ht-n').textContent=d.total;
+    $('ht-wr').textContent=trades.length?(wins/trades.length*100).toFixed(1)+'%':'0%';
+    colorSet($('ht-net'),net);
+  }catch(e){if(e&&e.message==='Unauthorized')return}
+}
+
+// ── SIGNALS ──
+async function loadSignals(){
+  try{
+    const url=_sigF==='ALL'?`${API}/api/signals?limit=200`:`${API}/api/signals?limit=200&status=${_sigF}`;
+    const r=await apiFetch(url);
+    const d=await r.json();
+    const tb=$('sig-tbody');tb.innerHTML='';
+    let pend=0;
+    if(!d.length){tb.innerHTML='<tr><td colspan="9" class="empty">No signals yet — C++ reasoning engine generates signals when all 5 metrics pass simultaneously</td></tr>';$('b-sig').textContent='0';return}
+    for(const s of d){
+      if(s.status==='PENDING')pend++;
+      const dc=s.action==='BUY'?'pill-buy':'pill-sell';
+      let sc='pill-ok';
+      if(s.status==='PENDING')sc='pill-pend';
+      if(s.status==='FAILED')sc='pill-fail';
+      if(s.status==='EXECUTED')sc='pill-exec';
+      tb.innerHTML+=`<tr><td style="color:var(--txt2)">${s.id}</td><td style="color:var(--txt2)">${fmtT(s.time)}</td><td>${s.symbol}</td><td><span class="pill ${dc}">${s.action}</span></td><td>${fmtP(s.symbol,s.price)}</td><td>${fmt(s.confidence,1)}%</td><td>${fmt(s.kelly_pct,2)}%</td><td style="color:var(--blue)">${s.pattern||'MEAN_REV'}</td><td><span class="pill ${sc}">${s.status}</span></td></tr>`;
+    }
+    $('b-sig').textContent=pend;
+  }catch(e){if(e&&e.message==='Unauthorized')return}
+}
+
+function sigFilter(f,btn){
+  _sigF=f;
+  document.querySelectorAll('#pnl-signals .tf').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  loadSignals();
+}
+
+// ── ACCOUNT ──
+async function loadAccount(){
+  try{
+    const [ar,dr,tr,er]=await Promise.all([
+      apiFetch(API+'/api/account'),
+      apiFetch(API+'/api/daily_pnl?days=30'),
+      apiFetch(API+'/api/transactions?limit=100'),
+      apiFetch(API+`/api/equity_history?hours=${_eqDays*24}`)
+    ]);
+    const ac=await ar.json(),daily=await dr.json(),txs=await tr.json(),eq=await er.json();
+
+    if(!ac.error){
+      $('ac-bal').textContent=fmtM(ac.balance);
+      $('ac-srv').textContent=ac.server||'—';
+      const eqEl=$('ac-eq');
+      eqEl.textContent=fmtM(ac.equity);
+      eqEl.className='ac-val '+(ac.equity<ac.balance?'neg':'pos');
+      colorSet($('ac-fl'),ac.floating_pnl);
+      $('ac-fl').className='ac-val '+(ac.floating_pnl<0?'neg':'pos');
+      $('ac-fl').textContent=fmtS(ac.floating_pnl);
+      $('ac-fm').textContent=fmtM(ac.free_margin);
+      const ml=+ac.margin_level||0;
+      const mlEl=$('ac-ml');
+      mlEl.textContent='Margin Level: '+ml.toFixed(0)+'%';
+      mlEl.className='ac-sub '+(ml<150?'neg':ml<300?'yel':'pos');
+      colorSet($('ac-tp'),ac.today.net_profit);
+      $('ac-tp').className='ac-val '+(ac.today.net_profit<0?'neg':'pos');
+      $('ac-tp').textContent=fmtS(ac.today.net_profit);
+      $('ac-td').textContent=ac.today.trades+' trades | Win: '+(ac.today.win_rate*100).toFixed(1)+'%';
+      colorSet($('ac-lp'),ac.lifetime.net_pnl);
+      $('ac-lp').className='ac-val '+(ac.lifetime.net_pnl<0?'neg':'pos');
+      $('ac-lp').textContent=fmtS(ac.lifetime.net_pnl);
+      $('ac-lt').textContent=ac.lifetime.trades+' trades (our system only)';
+      const rb=$('risk-bar');
+      if(ml>0&&ml<150){
+        rb.style.display='flex';
+        rb.className=ml<120?'danger':'';
+        $('risk-lbl').textContent=ml<120?'MARGIN CALL DANGER':'LOW MARGIN';
+        $('risk-msg').textContent=`Level ${ml.toFixed(0)}% — ${ml<120?'Immediate action required: close positions or deposit funds':'Consider closing some positions'}. Floating loss: ${fmtS(ac.floating_pnl)}`;
+      }else{rb.style.display='none'}
+    }
+
+    const dtb=$('daily-tbody');dtb.innerHTML='';
+    if(!daily.length){dtb.innerHTML='<tr><td colspan="7" class="empty">No daily P&L records yet</td></tr>'}
+    for(const row of daily){
+      const pc=row.net_profit>=0?'pos':'neg';
+      dtb.innerHTML+=`<tr><td>${row.date}</td><td>${row.trades}</td><td class="pos">$${fmt(row.gross_profit,2)}</td><td class="neg">$${fmt(Math.abs(row.gross_loss),2)}</td><td class="${pc}"><strong>${fmtS(row.net_profit)}</strong></td><td>${(row.win_rate*100).toFixed(1)}%</td><td>$${fmt(row.balance_eod,2)}</td></tr>`;
+    }
+
+    const ttb=$('tx-tbody');ttb.innerHTML='';
+    if(!txs.length){ttb.innerHTML='<tr><td colspan="5" class="empty">No transactions recorded</td></tr>'}
+    for(const t of txs){
+      const cls=t.type==='DEPOSIT'?'pos':'neg';
+      ttb.innerHTML+=`<tr><td style="color:var(--txt2)">${fmtT(t.time)}</td><td class="${cls}">${t.type}</td><td class="${cls}">${fmtS(t.amount)}</td><td>$${fmt(t.balance_after,2)}</td><td style="color:var(--txt2);max-width:200px;overflow:hidden;text-overflow:ellipsis">${t.note||'—'}</td></tr>`;
+    }
+
+    drawEqCurve(eq);
+  }catch(e){if(e&&e.message==='Unauthorized')return}
+}
+
+function setEqPeriod(d,btn){
+  _eqDays=d;
+  document.querySelectorAll('#ac-right .tf').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  loadAccount();
+}
+
+function drawEqCurve(data){
+  const c=$('eq');
+  const W=c.parentElement.offsetWidth,H=c.parentElement.offsetHeight;
+  c.width=W;c.height=H;
+  const ctx=c.getContext('2d');
+  ctx.fillStyle='#080b0f';ctx.fillRect(0,0,W,H);
+  if(!data||data.length<2){
+    ctx.fillStyle='#4a6080';ctx.font='11px Courier New';ctx.textAlign='center';
+    ctx.fillText('No equity data yet — account snapshots recorded every 5s',W/2,H/2);
+    return;
+  }
+  const pd={t:10,b:20,l:72,r:10};
+  const cw=W-pd.l-pd.r,ch=H-pd.t-pd.b;
+  const bals=data.map(d=>d.balance),eqs=data.map(d=>d.equity);
+  const mn=Math.min(...bals,...eqs)*.999,mx=Math.max(...bals,...eqs)*1.001;
+  const rng=mx-mn||.001;
+  const s=cw/(data.length-1);
+  ctx.strokeStyle='#161e28';ctx.lineWidth=1;
+  for(let i=0;i<=4;i++){
+    const y=pd.t+(i/4)*ch;
+    ctx.beginPath();ctx.moveTo(pd.l,y);ctx.lineTo(W-pd.r,y);ctx.stroke();
+    ctx.fillStyle='#4a6080';ctx.font='9px Courier New';ctx.textAlign='right';
+    ctx.fillText('$'+(mx-(i/4)*rng).toFixed(2),pd.l-3,y+3);
+  }
+  ctx.beginPath();ctx.strokeStyle='#ffc300';ctx.lineWidth=1;ctx.setLineDash([4,3]);
+  data.forEach((d,i)=>{const x=pd.l+i*s,y=pd.t+((mx-d.balance)/rng)*ch;i?ctx.lineTo(x,y):ctx.moveTo(x,y)});
+  ctx.stroke();ctx.setLineDash([]);
+  ctx.beginPath();
+  data.forEach((d,i)=>{const x=pd.l+i*s,y=pd.t+((mx-d.equity)/rng)*ch;i?ctx.lineTo(x,y):ctx.moveTo(x,y)});
+  ctx.lineTo(W-pd.r,H-pd.b);ctx.lineTo(pd.l,H-pd.b);ctx.closePath();
+  const grd=ctx.createLinearGradient(0,0,0,H);
+  grd.addColorStop(0,'rgba(0,180,216,.3)');grd.addColorStop(1,'rgba(0,180,216,0)');
+  ctx.fillStyle=grd;ctx.fill();
+  ctx.beginPath();ctx.strokeStyle='#00b4d8';ctx.lineWidth=2;ctx.shadowColor='#00b4d8';ctx.shadowBlur=6;
+  data.forEach((d,i)=>{const x=pd.l+i*s,y=pd.t+((mx-d.equity)/rng)*ch;i?ctx.lineTo(x,y):ctx.moveTo(x,y)});
+  ctx.stroke();ctx.shadowBlur=0;
+}
+
+// ── COMPLIANCE ──
+let _compSect='audit';
+function compSection(s,btn){
+  _compSect=s;
+  document.querySelectorAll('#comp-sect-tabs .tf').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('#pnl-compliance .sect-body').forEach(el=>{
+    el.classList.toggle('on', el.id==='sect-'+s);
+  });
+  if(s==='audit')  loadAuditLog();
+  if(s==='ledger') loadInvestorLedger();
+  if(s==='nav')    loadNavHistory();
+}
+
+async function loadCompliance(){
+  loadAuditLog();
+  // Set default export date range
+  const today=new Date().toISOString().slice(0,10);
+  const month=new Date(Date.now()-30*864e5).toISOString().slice(0,10);
+  if(!$('exp-from').value) $('exp-from').value=month;
+  if(!$('exp-to').value)   $('exp-to').value=today;
+}
+
+async function loadAuditLog(){
+  try{
+    const r=await apiFetch(API+'/api/audit_log?limit=200');
+    if(!r.ok)return;
+    const d=await r.json();
+    const tb=$('audit-tbody');tb.innerHTML='';
+    if(!d.logs||!d.logs.length){tb.innerHTML='<tr><td colspan="7" class="empty">No audit log entries yet</td></tr>';return}
+    for(const l of d.logs){
+      const ok=l.success?'<span class="pos">OK</span>':'<span class="neg">FAIL</span>';
+      const roleHtml=l.role?`<span class="role-pill role-${l.role}">${l.role.replace('_',' ')}</span>`:'—';
+      tb.innerHTML+=`<tr>
+        <td style="color:var(--txt2)">${fmtT(l.ts)}</td>
+        <td>${l.username||'—'}</td>
+        <td>${roleHtml}</td>
+        <td style="color:var(--blue)">${l.action}</td>
+        <td style="color:var(--txt3)">${l.resource||'—'}</td>
+        <td style="color:var(--txt2)">${l.ip_address||'—'}</td>
+        <td>${ok}${l.error_msg?` <span style="color:var(--red);font-size:9px">${l.error_msg}</span>`:''}</td>
+      </tr>`;
+    }
+  }catch(e){if(e&&e.message==='Unauthorized')return}
+}
+
+async function loadInvestorLedger(){
+  try{
+    const r=await apiFetch(API+'/api/investor_ledger');
+    if(!r.ok)return;
+    const d=await r.json();
+    const tb=$('ledger-tbody');tb.innerHTML='';
+    let netAum=0;
+    if(!d.length){tb.innerHTML='<tr><td colspan="7" class="empty">No investor ledger entries — no external capital recorded yet</td></tr>';}
+    for(const l of d){
+      netAum+=l.amount_usd;
+      const ac=l.amount_usd>=0?'pos':'neg';
+      tb.innerHTML+=`<tr>
+        <td style="color:var(--txt2)">${fmtT(l.ts)}</td>
+        <td>${l.investor_name}</td>
+        <td class="${l.entry_type==='SUBSCRIPTION'?'pos':'neg'}">${l.entry_type}</td>
+        <td class="${ac}">${fmtS(l.amount_usd)}</td>
+        <td style="color:var(--txt3)">${l.nav_at_entry?fmt(l.nav_at_entry,4):'—'}</td>
+        <td style="color:var(--txt3)">${l.shares_delta?fmt(l.shares_delta,6):'—'}</td>
+        <td style="color:var(--txt2)">${l.reference_doc||'—'}</td>
+      </tr>`;
+    }
+    $('comp-aum').textContent=fmtM(netAum);
+  }catch(e){if(e&&e.message==='Unauthorized')return}
+}
+
+async function loadNavHistory(){
+  try{
+    const r=await apiFetch(API+'/api/nav');
+    if(!r.ok)return;
+    const d=await r.json();
+    const tb=$('nav-tbody');tb.innerHTML='';
+    if(!d.length){tb.innerHTML='<tr><td colspan="9" class="empty">No NAV history yet — record daily NAV after market close</td></tr>';return}
+    for(const n of d){
+      const pc=n.net_pnl>=0?'pos':'neg';
+      tb.innerHTML+=`<tr>
+        <td>${n.nav_date}</td>
+        <td class="blue">${fmtM(n.total_aum)}</td>
+        <td style="color:var(--txt3)">${fmt(n.total_shares,4)}</td>
+        <td class="blue">${fmt(n.nav_per_share,6)}</td>
+        <td class="${n.gross_pnl>=0?'pos':'neg'}">${fmtS(n.gross_pnl)}</td>
+        <td class="${pc}"><strong>${fmtS(n.net_pnl)}</strong></td>
+        <td style="color:var(--txt2)">${fmtM(n.mgmt_fee)}</td>
+        <td style="color:var(--txt2)">${fmtM(n.perf_fee)}</td>
+        <td>${n.locked?'<span class="pos">SEALED</span>':'<span style="color:var(--txt2)">OPEN</span>'}</td>
+      </tr>`;
+    }
+  }catch(e){if(e&&e.message==='Unauthorized')return}
+}
+
+async function exportReport(){
+  try{
+    const from=$('exp-from').value||'';
+    const to=$('exp-to').value||'';
+    let url=API+'/api/compliance_report';
+    const p=[];
+    if(from)p.push('from='+from);
+    if(to)p.push('to='+to);
+    if(p.length)url+='?'+p.join('&');
+    const r=await apiFetch(url);
+    if(!r.ok){alert('Export failed — check console');return}
+    const d=await r.json();
+    const blob=new Blob([JSON.stringify(d,null,2)],{type:'application/json'});
+    const a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='klda_compliance_'+(from||'all')+'_'+(to||'now')+'.json';
+    a.click();
+  }catch(e){if(e&&e.message==='Unauthorized')return}
+}
+
+// ── ADMIN ──
+let _adminSect='users';
+function adminSection(s,btn){
+  _adminSect=s;
+  document.querySelectorAll('#admin-sect-tabs .tf').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  $('admin-users').style.display=s==='users'?'flex':'none';
+  $('admin-system').style.display=s==='system'?'flex':'none';
+  if(s==='users')  loadUsers();
+  if(s==='system') loadSystemStatus();
+}
+
+async function loadAdmin(){
+  loadUsers();
+}
+
+async function loadUsers(){
+  try{
+    const r=await apiFetch(API+'/api/users');
+    if(!r.ok)return;
+    const d=await r.json();
+    const tb=$('users-tbody');tb.innerHTML='';
+    if(!d.length){tb.innerHTML='<tr><td colspan="7" class="empty">No users found</td></tr>';return}
+    for(const u of d){
+      const sCls=u.is_active?'pos':'neg';
+      const sTxt=u.is_active?'ACTIVE':'INACTIVE';
+      const action=u.is_active
+        ?`<span class="tf" style="cursor:pointer;color:var(--red)" onclick="setUserActive(${u.id},false)">DEACTIVATE</span>`
+        :`<span class="tf" style="cursor:pointer;color:var(--green)" onclick="setUserActive(${u.id},true)">ACTIVATE</span>`;
+      tb.innerHTML+=`<tr>
+        <td style="color:var(--txt2)">${u.id}</td>
+        <td>${u.username}</td>
+        <td style="color:var(--txt3)">${u.email}</td>
+        <td><span class="role-pill role-${u.role}">${u.role.replace('_',' ').toUpperCase()}</span></td>
+        <td class="${sCls}">${sTxt}</td>
+        <td style="color:var(--txt2)">${fmtT(u.last_login)}</td>
+        <td>${action}</td>
+      </tr>`;
+    }
+  }catch(e){if(e&&e.message==='Unauthorized')return}
+}
+
+async function loadSystemStatus(){
+  try{
+    const r=await apiFetch(API+'/api/stats');
+    if(!r.ok)return;
+    const d=await r.json();
+    $('sys-status').innerHTML=`
+      <div>Ticks in DB: <span class="val">${(d.ticks_total||0).toLocaleString()}</span></div>
+      <div>Signals generated: <span class="val">${d.signals_total||0}</span></div>
+      <div>Live symbols: <span class="val" style="color:var(--green)">${d.live_symbols||0}</span></div>
+      <div>Open positions: <span class="val" style="color:var(--yel)">${d.open_positions||0}</span></div>
+      <div>Closed trades: <span class="val">${d.closed_trades||0}</span></div>
+      <div>Server time: <span class="val" style="color:var(--txt3)">${d.server_time||'—'}</span></div>
+    `;
+  }catch(e){if(e&&e.message==='Unauthorized')return}
+}
+
+function showCreateUser(){
+  $('create-user-modal').style.display='flex';
+  setTimeout(()=>$('nu-user').focus(),50);
+}
+
+function hideCreateUser(){
+  $('create-user-modal').style.display='none';
+  $('cu-err').textContent='';
+  $('nu-user').value=''; $('nu-email').value='';
+  $('nu-pass').value='';
+}
+
+async function createUser(){
+  const username=$('nu-user').value.trim();
+  const email=$('nu-email').value.trim();
+  const password=$('nu-pass').value;
+  const role=$('nu-role').value;
+  if(!username||!email||!password){$('cu-err').textContent='All fields required';return}
+  try{
+    const r=await apiFetch(API+'/api/users',{
+      method:'POST',
+      body:JSON.stringify({username,email,password,role})
+    });
+    const d=await r.json();
+    if(!r.ok){$('cu-err').textContent=d.error||'Failed';return}
+    hideCreateUser();
+    loadUsers();
+  }catch(e){
+    if(e&&e.message==='Unauthorized')return;
+    $('cu-err').textContent='Server error';
+  }
+}
+
+async function setUserActive(id,active){
+  if(!active&&!confirm('Deactivate this user? They will lose all access.'))return;
+  try{
+    await apiFetch(API+'/api/users/'+id,{method:'PUT',body:JSON.stringify({is_active:active})});
+    loadUsers();
+  }catch(e){if(e&&e.message==='Unauthorized')return}
+}
+
+// ── CLOCK ──
+function clock(){$('utc').textContent=new Date().toUTCString().slice(17,25)+' UTC'}
+
+// ── MAIN LOOP ──
+function start(){
+  buildSb();
+  loadHeader(); loadSb();
+  setInterval(loadTicks, 300);
+  setInterval(()=>{loadSb();loadHeader()}, 1000);
+  setInterval(()=>{
+    if(tab==='positions') loadPositions();
+    if(tab==='signals')   loadSignals();
+  }, 2000);
+  setInterval(()=>{
+    if(tab==='history')    loadHistory();
+    if(tab==='account')    loadAccount();
+    if(tab==='compliance') loadCompliance();
+  }, 10000);
+  setInterval(clock, 1000); clock();
+  window.addEventListener('resize',()=>{if(bars.length)drawBars();drawEKG()});
+  intervalsStarted=true;
+}
+
+window.addEventListener('load',()=>{
+  // Enter key on login form
+  $('l-user').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+  $('l-pass').addEventListener('keydown',e=>{if(e.key==='Enter')doLogin()});
+  // Check for stored token
+  checkAuth();
+});
+</script>
+</body>
+</html>

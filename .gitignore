@@ -32,6 +32,14 @@ Desktop.ini
 *.tmp
 *.bak
 
+## Database dumps (multi-GB, never in git)
+backup_*.sql
+*.dump
+
+## Python
+__pycache__/
+*.pyc
+
 ## Keep documentation
 !README.md
 !PROJECT_THEORY.md

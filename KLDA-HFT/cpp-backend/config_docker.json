@@ -1,6 +1,6 @@
 {
   "database": {
-    "host": "localhost",
+    "host": "172.31.192.1",
     "port": 5432,
     "name": "KLDA-HFT_Database",
     "user": "postgres",

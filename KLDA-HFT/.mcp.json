@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "klda-hft": {
+      "command": "python",
+      "args": ["C:/Users/PC/Desktop/KLDAFinTech/KLDA-HFT/mcp_server.py"]
+    }
+  }
+}

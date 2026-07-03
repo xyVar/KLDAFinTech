@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>KLDA-HFT System Monitor</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Consolas', monospace;
+            background: #000;
+            color: #0f0;
+            padding: 20px;
+        }
+        h1 {
+            border-bottom: 2px solid #0f0;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .status {
+            padding: 15px;
+            margin: 10px 0;
+            border: 2px solid #0f0;
+            background: rgba(0, 50, 0, 0.3);
+        }
+        .status strong {
+            display: inline-block;
+            width: 200px;
+            color: #0ff;
+        }
+        .healthy {
+            border-color: #0f0;
+            background: rgba(0, 50, 0, 0.5);
+        }
+        .unhealthy {
+            border-color: #f00;
+            background: rgba(50, 0, 0, 0.5);
+            color: #f00;
+        }
+        .warning {
+            border-color: #ff0;
+            background: rgba(50, 50, 0, 0.5);
+            color: #ff0;
+        }
+        .info {
+            margin-top: 30px;
+            padding: 15px;
+            border: 1px solid #0f0;
+            background: rgba(0, 20, 0, 0.5);
+            font-size: 12px;
+        }
+        .commands {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid #0f0;
+            background: rgba(0, 20, 0, 0.5);
+        }
+        .commands h3 {
+            color: #0ff;
+            margin-bottom: 10px;
+        }
+        .commands code {
+            display: block;
+            background: #001;
+            padding: 5px;
+            margin: 5px 0;
+            color: #0f0;
+        }
+        #refresh-time {
+            text-align: right;
+            color: #666;
+            font-size: 11px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>KLDA-HFT SYSTEM MONITOR</h1>
+
+    <div id="flask-status" class="status">
+        <strong>Flask API:</strong> <span id="flask-text">Checking...</span>
+    </div>
+
+    <div id="db-status" class="status">
+        <strong>Database Connection:</strong> <span id="db-text">Checking...</span>
+    </div>
+
+    <div id="ticks-status" class="status">
+        <strong>Last Tick Received:</strong> <span id="ticks-text">Checking...</span>
+    </div>
+
+    <div id="stats-status" class="status">
+        <strong>Tick Statistics:</strong> <span id="stats-text">Checking...</span>
+    </div>
+
+    <div id="cpp-status" class="status">
+        <strong>C++ Backend:</strong> <span id="cpp-text">Checking...</span>
+    </div>
+
+    <div id="refresh-time">Last refresh: <span id="refresh-timestamp">--:--:--</span> | Auto-refresh: 5s</div>
+
+    <div class="commands">
+        <h3>QUICK COMMANDS</h3>
+        <strong>Restart Everything:</strong>
+        <code>C:\Users\PC\Desktop\KLDAFinTech\KLDA-HFT\start_all.bat</code>
+
+        <strong>Stop Everything:</strong>
+        <code>C:\Users\PC\Desktop\KLDAFinTech\KLDA-HFT\stop_all.bat</code>
+
+        <strong>Check Flask Stats:</strong>
+        <code>curl http://localhost:5000/stats</code>
+
+        <strong>Check Database:</strong>
+        <code>psql -U postgres -d KLDA-HFT_Database -c "SELECT MAX(last_updated), NOW() - MAX(last_updated) FROM current;"</code>
+    </div>
+
+    <div class="info">
+        <strong>System Components:</strong><br>
+        • Flask API (port 5000) - Receives ticks from MT5 bridge<br>
+        • MT5 Bridge (Python) - Captures ticks from Pepperstone MT5<br>
+        • PostgreSQL (port 5432) - Stores all tick data<br>
+        • C++ Backend (port 8080) - Calculates Renaissance metrics<br>
+        • Web Dashboard (port 8082) - Displays live data<br>
+        • Watchdog (Python) - Auto-restarts on failure<br><br>
+
+        <strong>Healthy System:</strong><br>
+        • Flask API responds within 5 seconds<br>
+        • Database receives ticks within 5 minutes<br>
+        • C++ backend updates JSON every 1 second<br><br>
+
+        <strong>If Unhealthy:</strong><br>
+        1. Run stop_all.bat<br>
+        2. Wait 10 seconds<br>
+        3. Run start_all.bat<br>
+        4. Wait 30 seconds and refresh this page
+    </div>
+
+    <script>
+        async function checkSystem() {
+            const now = new Date();
+            document.getElementById('refresh-timestamp').textContent = now.toLocaleTimeString();
+
+            // Check Flask API
+            try {
+                const response = await fetch('http://localhost:5000/stats');
+                if (!response.ok) throw new Error('HTTP error');
+
+                const data = await response.json();
+
+                document.getElementById('flask-text').innerHTML = `
+                    <span style="color: #0f0;">✓ ONLINE</span> (${data.ticks_processed.toLocaleString()} ticks processed)
+                `;
+                document.getElementById('flask-status').className = 'status healthy';
+
+                // Parse last flush time
+                const lastFlush = new Date(data.last_flush);
+                const ageSeconds = (new Date() - lastFlush) / 1000;
+
+                // Tick freshness check
+                if (ageSeconds < 300) {
+                    document.getElementById('ticks-text').innerHTML = `
+                        <span style="color: #0f0;">✓ FRESH</span> (${Math.floor(ageSeconds)}s ago)
+                    `;
+                    document.getElementById('ticks-status').className = 'status healthy';
+                } else if (ageSeconds < 3600) {
+                    document.getElementById('ticks-text').innerHTML = `
+                        <span style="color: #ff0;">⚠ STALE</span> (${Math.floor(ageSeconds/60)} minutes ago)
+                    `;
+                    document.getElementById('ticks-status').className = 'status warning';
+                } else {
+                    const hours = Math.floor(ageSeconds / 3600);
+                    document.getElementById('ticks-text').innerHTML = `
+                        <span style="color: #f00;">✗ DEAD</span> (${hours} hours ago)
+                    `;
+                    document.getElementById('ticks-status').className = 'status unhealthy';
+                }
+
+                // Statistics
+                document.getElementById('stats-text').innerHTML = `
+                    Received: ${data.ticks_received.toLocaleString()} |
+                    Processed: ${data.ticks_processed.toLocaleString()} |
+                    Buffer: ${data.buffer_size} |
+                    Errors: ${data.errors}
+                `;
+                document.getElementById('stats-status').className = 'status healthy';
+
+            } catch (e) {
+                document.getElementById('flask-text').innerHTML = '<span style="color: #f00;">✗ OFFLINE</span>';
+                document.getElementById('flask-status').className = 'status unhealthy';
+                document.getElementById('ticks-text').innerHTML = '<span style="color: #f00;">✗ UNKNOWN</span>';
+                document.getElementById('ticks-status').className = 'status unhealthy';
+                document.getElementById('stats-text').innerHTML = '<span style="color: #f00;">✗ NO DATA</span>';
+                document.getElementById('stats-status').className = 'status unhealthy';
+            }
+
+            // Check C++ Backend (via live_ticks.json)
+            try {
+                const cppResponse = await fetch('live_ticks.json?' + Date.now());
+                if (!cppResponse.ok) throw new Error('File not found');
+
+                const cppData = await cppResponse.json();
+                const updateAge = Date.now()/1000 - cppData.timestamp;
+
+                if (updateAge < 10) {
+                    document.getElementById('cpp-text').innerHTML = `
+                        <span style="color: #0f0;">✓ RUNNING</span> (Update #${cppData.update_count.toLocaleString()}, ${Math.floor(updateAge)}s ago)
+                    `;
+                    document.getElementById('cpp-status').className = 'status healthy';
+                } else {
+                    document.getElementById('cpp-text').innerHTML = `
+                        <span style="color: #ff0;">⚠ STALE</span> (Last update ${Math.floor(updateAge)}s ago)
+                    `;
+                    document.getElementById('cpp-status').className = 'status warning';
+                }
+            } catch (e) {
+                document.getElementById('cpp-text').innerHTML = '<span style="color: #f00;">✗ NOT RUNNING</span>';
+                document.getElementById('cpp-status').className = 'status unhealthy';
+            }
+
+            // Database connection check (via Flask /health)
+            try {
+                const healthResponse = await fetch('http://localhost:5000/health');
+                if (!healthResponse.ok) throw new Error('Health check failed');
+
+                const healthData = await healthResponse.json();
+
+                if (healthData.database === 'connected') {
+                    document.getElementById('db-text').innerHTML = '<span style="color: #0f0;">✓ CONNECTED</span>';
+                    document.getElementById('db-status').className = 'status healthy';
+                } else {
+                    document.getElementById('db-text').innerHTML = '<span style="color: #f00;">✗ DISCONNECTED</span>';
+                    document.getElementById('db-status').className = 'status unhealthy';
+                }
+            } catch (e) {
+                document.getElementById('db-text').innerHTML = '<span style="color: #f00;">✗ UNKNOWN</span>';
+                document.getElementById('db-status').className = 'status unhealthy';
+            }
+        }
+
+        // Initial check
+        checkSystem();
+
+        // Auto-refresh every 5 seconds
+        setInterval(checkSystem, 5000);
+    </script>
+</body>
+</html>

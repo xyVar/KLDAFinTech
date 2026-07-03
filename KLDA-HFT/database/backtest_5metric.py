@@ -13,7 +13,11 @@ SYMBOL = 'SpotCrude'  # Test on live commodity
 INITIAL_CAPITAL = 10000.0
 RISK_PER_TRADE = 0.02  # 2%
 TARGET_PROFIT = 0.005  # 0.5%
-STOP_LOSS = 0.01  # 1%
+STOP_LOSS = 0.01       # 1%
+
+# Per-symbol contract spec (from MT5 symbol_info)
+POINT_SIZE = 0.001        # SpotCrude: point=0.001 (digits=3)
+COMMISSION_PER_SHARE = 0.0  # CFD — built into spread
 
 # Renaissance Parameters (OPTIMIZED FOR SPOTCRUDE)
 MEAN_REV_WINDOW = 50
@@ -22,7 +26,6 @@ SPREAD_VOL_WINDOW = 100
 SPREAD_WIDEN_THRESHOLD = 50.0  # Commodity spreads are more volatile
 HMM_WINDOW = 200
 HMM_TREND_THRESHOLD = 0.1  # Lower trend threshold for commodities
-MAX_TX_COST = 20.0  # Commodity spreads are higher
 MAX_KELLY_PCT = 2.0
 
 print("=" * 80)
@@ -43,15 +46,15 @@ conn = psycopg2.connect(
 
 # Load tick data
 print("\n[1/7] Loading tick data from PostgreSQL...")
-table_name = f"{SYMBOL.lower()}_history"
-
-query = f"""
+query = """
     SELECT time, bid, ask, spread
-    FROM {table_name}
-    ORDER BY time ASC;
+    FROM ticks
+    WHERE symbol = %s
+    ORDER BY time ASC
+    LIMIT 1000000;
 """
 
-df = pd.read_sql_query(query, conn)
+df = pd.read_sql_query(query, conn, params=(SYMBOL,))
 conn.close()
 
 print(f"    Loaded {len(df):,} ticks")
@@ -78,27 +81,19 @@ df['regime'] = 'NEUTRAL'
 df.loc[df['trend_pct'] > HMM_TREND_THRESHOLD, 'regime'] = 'BULLISH'
 df.loc[df['trend_pct'] < -HMM_TREND_THRESHOLD, 'regime'] = 'BEARISH'
 
-print("\n[5/7] Calculating Transaction Cost...")
-df['tx_cost'] = df['spread'] / 2.0 + 0.10  # Half spread + swap
+print("\n[5/7] Calculating Transaction Cost (per share)...")
+# spread is stored in POINTS (bridge: (ask-bid)/point) — convert to dollars per share
+df['tx_cost_per_share'] = (df['spread'] * POINT_SIZE) / 2.0 + COMMISSION_PER_SHARE
 
-print("\n[6/7] Calculating Kelly Position Size...")
-win_rate = 0.5075
-avg_win = TARGET_PROFIT
-avg_loss = STOP_LOSS
-p = win_rate
-q = 1.0 - win_rate
-b = avg_win / avg_loss
-kelly_fraction = (p * b - q) / b
-kelly_pct = (kelly_fraction / 2.0) * 100.0
-df['kelly_pct'] = min(kelly_pct, MAX_KELLY_PCT)
+print("\n[6/7] Setting fixed 1% position size (A2: bypassing broken Kelly)...")
+df['kelly_pct'] = 1.0
 
 print("\n[7/7] Generating Entry Signals...")
-# ALL 5 CONDITIONS MUST BE TRUE
+# 4 conditions (tx_cost filter dropped — meaningless after unit fix; revisit with % filter later)
 df['signal'] = (
     (df['mean_rev'] < MEAN_REV_THRESHOLD) &  # Price below MA
     (df['spread_vol'] < SPREAD_WIDEN_THRESHOLD) &  # Spread not too wide
-    (df['regime'] == 'BULLISH') &  # Bullish regime
-    (df['tx_cost'] < MAX_TX_COST) &  # Acceptable cost
+    (df['regime'] != 'BEARISH') &  # mean reversion in non-bearish regimes
     (df['kelly_pct'] < MAX_KELLY_PCT)  # Safe position size
 )
 
@@ -131,18 +126,20 @@ for idx, row in df.iterrows():
             'position_size': position_size,
             'stop_loss': stop_loss_price,
             'take_profit': take_profit_price,
-            'tx_cost': row['tx_cost']
+            'tx_cost_per_share': row['tx_cost_per_share']
         }
 
     # Check for exit
     elif position is not None:
         current_price = row['bid']
 
+        # Round-trip tx cost (entry + exit)
+        tx_cost_total = position['tx_cost_per_share'] * position['shares'] * 2
+
         # Check TP
         if current_price >= position['take_profit']:
-            # Winning trade
-            profit = (position['take_profit'] - position['entry_price']) * position['shares']
-            profit -= position['tx_cost']
+            gross = (position['take_profit'] - position['entry_price']) * position['shares']
+            profit = gross - tx_cost_total
             capital += profit
 
             trades.append({
@@ -151,25 +148,24 @@ for idx, row in df.iterrows():
                 'entry_price': position['entry_price'],
                 'exit_price': position['take_profit'],
                 'profit': profit,
-                'result': 'WIN'
+                'result': 'WIN' if profit > 0 else 'LOSS'
             })
 
             position = None
 
         # Check SL
         elif current_price <= position['stop_loss']:
-            # Losing trade
-            loss = (position['entry_price'] - position['stop_loss']) * position['shares']
-            loss += position['tx_cost']
-            capital -= loss
+            gross = (position['stop_loss'] - position['entry_price']) * position['shares']  # negative
+            profit = gross - tx_cost_total
+            capital += profit
 
             trades.append({
                 'entry_time': position['entry_time'],
                 'exit_time': row['time'],
                 'entry_price': position['entry_price'],
                 'exit_price': position['stop_loss'],
-                'profit': -loss,
-                'result': 'LOSS'
+                'profit': profit,
+                'result': 'WIN' if profit > 0 else 'LOSS'
             })
 
             position = None
@@ -181,14 +177,13 @@ print("=" * 80)
 
 if len(trades) == 0:
     print("\n[!] NO TRADES EXECUTED")
-    print("    All 5 conditions were NEVER true simultaneously")
+    print("    Conditions were NEVER true simultaneously")
     print("\nDIAGNOSTICS:")
     print(f"  Ticks analyzed: {len(df):,}")
     print(f"  Mean Rev < {MEAN_REV_THRESHOLD}%: {(df['mean_rev'] < MEAN_REV_THRESHOLD).sum():,} ticks")
     print(f"  Spread Vol < {SPREAD_WIDEN_THRESHOLD}%: {(df['spread_vol'] < SPREAD_WIDEN_THRESHOLD).sum():,} ticks")
-    print(f"  Regime = BULLISH: {(df['regime'] == 'BULLISH').sum():,} ticks")
-    print(f"  TX Cost < ${MAX_TX_COST}: {(df['tx_cost'] < MAX_TX_COST).sum():,} ticks")
-    print(f"  ALL 5 TRUE: {df['signal'].sum()} ticks")
+    print(f"  Regime != BEARISH: {(df['regime'] != 'BEARISH').sum():,} ticks")
+    print(f"  ALL TRUE: {df['signal'].sum()} ticks")
 else:
     trades_df = pd.DataFrame(trades)
 
