@@ -64,7 +64,22 @@ database/backtest_5metric.py : research harness (spread-unit cost bug FIXED —
 |------|--------|------|--------|---------|
 | 2026-07-02 | 5-metric mean-reversion entry, SpotCrude | TP0.5%/SL1.0% (asymmetric) | 52.2% win | **Artifact** — asymmetric barriers make coin-flips look like edge |
 | 2026-07-02 | same, symmetric 0.5%/0.5% barriers | 26 trades, one afternoon | 34.6% win (p≈0.08) | Too small; hints signal may be **inverted** |
-| 2026-07-02 | same — FULL SWEEP: SpotCrude, XAUUSD, NAS100, US500 (~70M ticks), symmetric barriers, real spread costs | RUNNING on local machine | pending | pending |
+| 2026-07-02 | same — FULL SWEEP, 6 symbols, both directions, symmetric barriers, real spread at entry | 16,478 resolved trades | LONG 40.0% (z=−18.0), SHORT 39.9% (z=−18.4) — both directions lose identically | **Structural, not signal:** spread-drag. Median barrier 0.014% of price; spread eats ~10pts of win rate each side |
+
+### Structural doctrine established 2026-07-02 (from the sweep)
+1. **Tick horizon is BANNED** on retail CFD costs — spread-dominated, unwinnable for any
+   signal. (Renaissance plays tick-scale on institutional costs; we cannot.)
+2. **Spread-floor rule:** any tradable pattern must have a profit target that is a large
+   multiple of the spread (minute-scale and up). Cost model must use real spread at entry.
+3. **"Inverted signal" hypothesis is dead** — both directions losing equally proves the
+   loss is cost-drag, not mispolarity. Do not resurrect the fade.
+4. **Sample-size wall:** detecting a ~1% edge needs ~20,000 trades; we had 869 at the
+   workable scale. Bottleneck = days of continuous feed, not code. Feed uptime is the
+   research program.
+5. **Next hypotheses (being built by local session):** conditional edges — time-of-day ×
+   regime (trend/range) × cross-asset confirmation, swept across all 25 symbols. The naive
+   "price stretched → trade" versions are dead by measurement; 4 of 5 planned patterns
+   remain unbuilt/untested.
 
 **Reading key for the sweep (decision gate):**
 - Win rate **> 50% with decent z-score** on hundreds of trades → real edge → promote toward demo.
