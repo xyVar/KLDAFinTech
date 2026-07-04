@@ -66,6 +66,19 @@ database/backtest_5metric.py : research harness (spread-unit cost bug FIXED —
 | 2026-07-02 | same, symmetric 0.5%/0.5% barriers | 26 trades, one afternoon | 34.6% win (p≈0.08) | Too small; hints signal may be **inverted** |
 | 2026-07-02 | same — FULL SWEEP, 6 symbols, both directions, symmetric barriers, real spread at entry | 16,478 resolved trades | LONG 40.0% (z=−18.0), SHORT 39.9% (z=−18.4) — both directions lose identically | **Structural, not signal:** spread-drag. Median barrier 0.014% of price; spread eats ~10pts of win rate each side |
 
+### Infrastructure hardening completed 2026-07-03 (local session)
+- Engine/watchdog/backups committed to GitHub master (1b295d0, c96cee0, a3f2351).
+- Watchdog rebuilt: surgical bridge-only restarts, high-water-mark freshness check.
+- Nightly DB backups (02:30 task): 1,046MB base dump + per-day tick archives, verified.
+- Feed live on 26 symbols. Remaining: Postgres service autostart (needs elevated prompt).
+- Account forensics: $40→$7.07 was the user's own phone trades on MU.US stopped out in
+  June — no breach. Side-finding: **broker trade-block appears lifted**. Account history
+  shows large historical deposits and manual-trading losses — reinforces the doctrine.
+- 1-minute z-score sweep (869 trades, 6 symbols): naked z-score ≈ coin flip at minute
+  scale; costs manageable there. Real edge must be conditional (time-of-day × regime ×
+  cross-asset). Statistical wall: need ~20k trades → weeks of feed.
+- User absent ~15 days from 2026-07-04: machine accumulates data unattended (see RUNBOOK.md §0/§5).
+
 ### Structural doctrine established 2026-07-02 (from the sweep)
 1. **Tick horizon is BANNED** on retail CFD costs — spread-dominated, unwinnable for any
    signal. (Renaissance plays tick-scale on institutional costs; we cannot.)
