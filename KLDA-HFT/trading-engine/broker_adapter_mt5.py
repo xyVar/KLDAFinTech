@@ -13,15 +13,18 @@ import MetaTrader5 as mt5
 import psycopg2
 from datetime import datetime
 
+from config_loader import paper_mode
+
 DB_CONFIG = {
-    'host': 'localhost', 'port': 5432,
+    'host': '127.0.0.1', 'port': 5432,
     'database': 'KLDA-HFT_Database',
     'user': 'postgres', 'password': 'MyKldaTechnologies2025!'
 }
 
 MAGIC     = 234000
 DEVIATION = 20
-PAPER_MODE = True   # flip to False for live execution
+# Single source of truth: config/trading_config.json ("paper_mode")
+PAPER_MODE = paper_mode()
 
 
 def log(msg):

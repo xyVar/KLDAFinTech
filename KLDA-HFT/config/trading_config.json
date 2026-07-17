@@ -1,0 +1,23 @@
+{
+  "_comment": "Single source of truth for execution mode and signal thresholds. paper_mode: true = orders go to paper_positions, false = real MT5 order_send. execution_path: which process is allowed to consume the signals table ('order_router' or 'klda_engine') — the other refuses to start.",
+  "paper_mode": true,
+  "execution_path": "order_router",
+  "thresholds": {
+    "default": {
+      "mean_rev_threshold": -0.30,
+      "spread_vol_max": 150.0,
+      "hmm_trend_threshold": 0.05,
+      "regime_allow": ["BULLISH"],
+      "max_tx_cost_pct": 0.15,
+      "win_rate_baseline": 0.515,
+      "kelly_fraction": 0.25,
+      "min_kelly_pct": 0.3
+    },
+    "SpotCrude": {
+      "_comment": "Backtested 2026-07-17 on 14.6M ticks (Mar-Jul 2026): 243 trades, 58.4% win rate, p=0.005 vs 50% null — but NET NEGATIVE (-0.30%, PF 0.70) because the 0.5%TP/1.0%SL geometry needs 66.7% to break even. NOT validated for live use; kept for PAPER forward-testing only. Re-test with symmetric or 2:1 reward/risk TP/SL before trusting.",
+      "mean_rev_threshold": -0.2,
+      "hmm_trend_threshold": 0.1,
+      "regime_allow": ["BULLISH", "NEUTRAL"]
+    }
+  }
+}

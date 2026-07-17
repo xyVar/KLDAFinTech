@@ -6,6 +6,7 @@ Tests on YOUR real tick data from PostgreSQL
 
 import psycopg2
 import pandas as pd
+import math
 from datetime import datetime
 
 # Configuration
@@ -50,8 +51,7 @@ query = """
     SELECT time, bid, ask, spread
     FROM ticks
     WHERE symbol = %s
-    ORDER BY time ASC
-    LIMIT 1000000;
+    ORDER BY time ASC;
 """
 
 df = pd.read_sql_query(query, conn, params=(SYMBOL,))
@@ -109,32 +109,35 @@ trades = []
 capital = INITIAL_CAPITAL
 position = None
 
-for idx, row in df.iterrows():
+# NOTE on costs: entry fills at ASK, exits trigger on BID against levels derived
+# from the entry ask — the full bid/ask spread is therefore already paid inside
+# the fill prices. Charging tx_cost_per_share on top double-counts the spread,
+# so the explicit charge below is commission only (0 for CFDs).
+for row in df.itertuples(index=False):
     # Check for entry signal
-    if position is None and row['signal']:
+    if position is None and row.signal:
         # Open position
-        entry_price = row['ask']
-        position_size = capital * (row['kelly_pct'] / 100.0)
+        entry_price = row.ask
+        position_size = capital * (row.kelly_pct / 100.0)
         shares = position_size / entry_price
         stop_loss_price = entry_price * (1.0 - STOP_LOSS)
         take_profit_price = entry_price * (1.0 + TARGET_PROFIT)
 
         position = {
-            'entry_time': row['time'],
+            'entry_time': row.time,
             'entry_price': entry_price,
             'shares': shares,
             'position_size': position_size,
             'stop_loss': stop_loss_price,
             'take_profit': take_profit_price,
-            'tx_cost_per_share': row['tx_cost_per_share']
         }
 
     # Check for exit
     elif position is not None:
-        current_price = row['bid']
+        current_price = row.bid
 
-        # Round-trip tx cost (entry + exit)
-        tx_cost_total = position['tx_cost_per_share'] * position['shares'] * 2
+        # Commission only — spread is already in the ask-entry/bid-exit prices
+        tx_cost_total = COMMISSION_PER_SHARE * position['shares'] * 2
 
         # Check TP
         if current_price >= position['take_profit']:
@@ -144,7 +147,7 @@ for idx, row in df.iterrows():
 
             trades.append({
                 'entry_time': position['entry_time'],
-                'exit_time': row['time'],
+                'exit_time': row.time,
                 'entry_price': position['entry_price'],
                 'exit_price': position['take_profit'],
                 'profit': profit,
@@ -161,7 +164,7 @@ for idx, row in df.iterrows():
 
             trades.append({
                 'entry_time': position['entry_time'],
-                'exit_time': row['time'],
+                'exit_time': row.time,
                 'entry_price': position['entry_price'],
                 'exit_price': position['stop_loss'],
                 'profit': profit,
@@ -211,6 +214,32 @@ else:
     print(f"\nAvg Win: ${avg_win:.2f}")
     print(f"Avg Loss: ${avg_loss:.2f}")
     print(f"Profit Factor: {profit_factor:.2f}")
+
+    # ── Statistical validation ────────────────────────────────────────────
+    def binom_p_one_sided(k, n, p0):
+        """P(X >= k | n, p0), exact for small n, normal approx otherwise."""
+        if n <= 1000:
+            return sum(math.comb(n, i) * p0**i * (1 - p0)**(n - i) for i in range(k, n + 1))
+        mu = n * p0
+        sd = math.sqrt(n * p0 * (1 - p0))
+        z = (k - 0.5 - mu) / sd  # continuity correction
+        return 0.5 * math.erfc(z / math.sqrt(2))
+
+    # With TP=+0.5% and SL=-1.0%, a driftless random walk hits TP with
+    # probability SL/(TP+SL) — that geometry-implied rate is the honest null.
+    p_null_geom = STOP_LOSS / (TARGET_PROFIT + STOP_LOSS)
+    p_vs_50 = binom_p_one_sided(wins, total_trades, 0.50)
+    p_vs_geom = binom_p_one_sided(wins, total_trades, p_null_geom)
+
+    print("\n" + "=" * 80)
+    print("VALIDATION (bar: >=100 occurrences, >=51% win rate, p < 0.05)")
+    print("=" * 80)
+    print(f"Occurrences: {total_trades}  ({'PASS' if total_trades >= 100 else 'FAIL'} >=100)")
+    print(f"Win rate:    {win_rate:.1f}%  ({'PASS' if win_rate >= 51.0 else 'FAIL'} >=51%)")
+    print(f"p-value vs 50% null:                 {p_vs_50:.2e}  ({'PASS' if p_vs_50 < 0.05 else 'FAIL'} <0.05)")
+    print(f"p-value vs {p_null_geom*100:.1f}% geometry null:      {p_vs_geom:.2e}  ({'PASS' if p_vs_geom < 0.05 else 'FAIL'} <0.05)")
+    print(f"NOTE: with asymmetric TP/SL ({TARGET_PROFIT*100:.1f}%/{STOP_LOSS*100:.1f}%), a no-edge random walk")
+    print(f"      already wins ~{p_null_geom*100:.1f}% of trades — the geometry null is the real test.")
 
     print("\n" + "=" * 80)
     print("TRADE LOG (First 10 trades)")

@@ -4,8 +4,9 @@ Quick diagnostic — one scan, prints all metrics, does NOT write to DB.
 Run: python test_signal_gen.py
 """
 import psycopg2, sys, os
-sys.path.insert(0, os.path.dirname(__file__))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from signal_generator import SYMBOLS, DB_CONFIG, calculate_metrics, MIN_CONFIDENCE
+from config_loader import thresholds_for
 
 conn = psycopg2.connect(**DB_CONFIG)
 cur  = conn.cursor()
@@ -14,8 +15,8 @@ header = f"{'Symbol':<12} {'Bid':>10}  {'MeanRev':>9}  {'MA50':>10}  {'Regime':>
 print(header)
 print("-" * len(header))
 
-for signal_sym, tick_sym, bars_table in SYMBOLS:
-    m = calculate_metrics(cur, tick_sym, bars_table)
+for signal_sym, tick_sym in SYMBOLS:
+    m = calculate_metrics(cur, tick_sym, thresholds_for(signal_sym))
     if m is None:
         print(f"{signal_sym:<12} NO DATA (not enough M5 bars or no current tick)")
         continue

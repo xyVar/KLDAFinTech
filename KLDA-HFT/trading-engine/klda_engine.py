@@ -15,6 +15,11 @@ import psycopg2.extras
 from datetime import datetime, timedelta, timezone
 import time
 import threading
+import os
+import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from config_loader import execution_path
 
 DB_CONFIG = {
     'host': 'localhost', 'port': 5432,
@@ -354,6 +359,19 @@ def main():
     print("=" * 60)
     print("KLDA-HFT Trading Engine — Renaissance / Medallion Style")
     print("=" * 60)
+
+    # Only ONE process may consume the signals table. The active path is
+    # chosen in config/trading_config.json ("execution_path"). The paper
+    # chain (order_router → broker_adapter → reconciler) is the default;
+    # this engine has no paper mode and would burn PENDING signals with
+    # retcode-10017 failures on a trade-disabled account.
+    if execution_path() != 'klda_engine':
+        print("[DISABLED] execution_path is "
+              f"'{execution_path()}' in config/trading_config.json — "
+              "this engine will NOT run.")
+        print("           To use klda_engine instead of the order_router "
+              "chain, set execution_path to 'klda_engine'.")
+        return
 
     if not mt5.initialize():
         print(f"[ERROR] MT5 init failed: {mt5.last_error()}")
