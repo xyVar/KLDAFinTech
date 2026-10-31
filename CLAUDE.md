@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 Renaissance/Medallion-inspired tick-data trading system: capture every tick from MetaTrader 5 (Pepperstone), store in PostgreSQL + TimescaleDB, detect 5 statistical patterns (target 51%+ win rate), generate intraday signals, execute via MT5. All active work lives in `KLDA-HFT/`. Everything else that looks like a trading project (`archive/`, the root `README.md` describing manual Martingale/TSMC strategies) is **archived history — do not reintroduce it or take it as current**.
 
+`docs/PROTOCOL.md` is the canonical doctrine, locked decisions and research ledger (what has been tested and killed); `docs/RUNBOOK.md` is the human ops guide. Read PROTOCOL before proposing new signals.
+
 `SYSTEM_ARCHITECTURE.md` and `WHAT_WE_ARE_BUILDING.md` describe the vision; parts are aspirational (React frontend not built, MQL5 tick-capture EA superseded by the Python bridge). `KLDA-HFT/README.md` and `KLDA-HFT/MANAGE_MT5_BRIDGE.md` are stale — they describe the old Flask tick-receiver pipeline and advise `taskkill /F /IM python.exe`, both contradicted by the constraints below.
 
 The 5 patterns: Mean Reversion, Gap Fill, Pairs Divergence, Event Drift, Momentum Exhaustion. A pattern only counts as validated at ≥100 occurrences, ≥51% win rate, p < 0.05.
