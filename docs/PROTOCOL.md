@@ -65,6 +65,7 @@ database/backtest_5metric.py : research harness (spread-unit cost bug FIXED —
 | 2026-07-02 | 5-metric mean-reversion entry, SpotCrude | TP0.5%/SL1.0% (asymmetric) | 52.2% win | **Artifact** — asymmetric barriers make coin-flips look like edge |
 | 2026-07-02 | same, symmetric 0.5%/0.5% barriers | 26 trades, one afternoon | 34.6% win (p≈0.08) | Too small; hints signal may be **inverted** |
 | 2026-07-02 | same — FULL SWEEP, 6 symbols, both directions, symmetric barriers, real spread at entry | 16,478 resolved trades | LONG 40.0% (z=−18.0), SHORT 39.9% (z=−18.4) — both directions lose identically | **Structural, not signal:** spread-drag. Median barrier 0.014% of price; spread eats ~10pts of win rate each side |
+| 2026-11-02 | Conditional-pattern sweep HARNESS (5 patterns × stretch × regime × time-of-day, M1 bars, per-hour real spread + slippage, IS/OOS 70/30, BH-FDR, gate n≥100 / wr≥51% / p<0.05 / net>0) | built + synthetic-data functional test on branch lane-b/research (`KLDA-HFT/research/`) | execution pending on DB host | pending — results will be logged here; verdicts are PASS / FAIL / INSUFFICIENT_N |
 
 ### Infrastructure hardening completed 2026-07-03 (local session)
 - Engine/watchdog/backups committed to GitHub master (1b295d0, c96cee0, a3f2351).
