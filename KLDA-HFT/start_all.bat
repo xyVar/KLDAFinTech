@@ -18,6 +18,8 @@ echo.
 echo [2/6] Starting MT5 Tick Bridge (all symbols)...
 start "KLDA MT5 Bridge" /MIN cmd /c "cd C:\Users\PC\Desktop\KLDAFinTech\KLDA-HFT\python-bridge && python mt5_tick_capture_ALL_TICKS.py"
 timeout /t 6 /nobreak >nul
+echo       + Bridge watchdog (adopts the running bridge, restarts it on stall)
+start "KLDA Watchdog" /MIN cmd /c "cd C:\Users\PC\Desktop\KLDAFinTech\KLDA-HFT\python-bridge && python watchdog.py"
 
 echo [3/6] Starting C++ Reasoning Engine (Docker)...
 powershell -Command "wsl bash -c 'docker start klda-hft-cpp-backend 2>/dev/null || docker run -d --name klda-hft-cpp-backend klda-hft-engine:latest'" >nul 2>&1
@@ -33,15 +35,18 @@ start "KLDA Router" /MIN cmd /c "cd C:\Users\PC\Desktop\KLDAFinTech\KLDA-HFT\tra
 start "KLDA Reconciler" /MIN cmd /c "cd C:\Users\PC\Desktop\KLDAFinTech\KLDA-HFT\trading-engine && python reconciler.py"
 timeout /t 3 /nobreak >nul
 
-echo [6/6] Opening Trading Terminal...
+echo [6/6] Opening Trading Terminal + dashboard web server (port 8082)...
 start "" "C:\Users\PC\Desktop\KLDAFinTech\KLDA-HFT\api\trading_terminal.html"
+start "KLDA Dashboards" /MIN cmd /c "cd /d C:\Users\PC\Desktop\KLDAFinTech\KLDA-HFT\cpp-backend && python -m http.server 8082"
 
 echo.
 echo ============================================================
 echo KLDA-HFT Renaissance System Running
 echo ============================================================
 echo.
-echo   MT5 Bridge:       Capturing ticks (all 64 symbols)
+echo   MT5 Bridge:       Capturing ticks (Market Watch symbols) + watchdog
+echo   Dashboards:       http://localhost:8082/live_ticker.html
+echo   Health report:    python monitoring\hourly_health_check.py --report
 echo   C++ Engine:       Reasoning / pattern detection
 echo   Trading API:      http://localhost:5002
 echo   Trading Engine:   Watching signals, auto-executing

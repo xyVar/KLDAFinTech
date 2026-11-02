@@ -15,7 +15,7 @@ powershell -NoProfile -Command ^
 
 echo [2/3] Stopping KLDA bridge, signal generator, router, reconciler, engine, APIs...
 powershell -NoProfile -Command ^
-  "$scripts = @('mt5_tick_capture_ALL_TICKS.py','mt5_tick_capture.py','signal_generator.py','order_router.py','reconciler.py','klda_engine.py','trading_api.py','tick_receiver.py','positions_api.py','tick_api.py'); Get-CimInstance Win32_Process -Filter \"Name='python.exe'\" | ForEach-Object { $p = $_; foreach ($s in $scripts) { if ($p.CommandLine -like ('*' + $s + '*')) { Write-Host ('  killing PID ' + $p.ProcessId + ' (' + $s + ')'); Stop-Process -Id $p.ProcessId -Force; break } } }"
+  "$scripts = @('mt5_tick_capture_ALL_TICKS.py','mt5_tick_capture.py','signal_generator.py','order_router.py','reconciler.py','klda_engine.py','trading_api.py','tick_receiver.py','positions_api.py','tick_api.py','http.server 8082'); Get-CimInstance Win32_Process -Filter \"Name='python.exe'\" | ForEach-Object { $p = $_; foreach ($s in $scripts) { if ($p.CommandLine -like ('*' + $s + '*')) { Write-Host ('  killing PID ' + $p.ProcessId + ' (' + $s + ')'); Stop-Process -Id $p.ProcessId -Force; break } } }"
 
 echo [3/3] Stopping Docker container...
 docker stop klda-hft-cpp-backend >nul 2>&1
