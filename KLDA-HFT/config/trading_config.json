@@ -2,6 +2,16 @@
   "_comment": "Single source of truth for execution mode and signal thresholds. paper_mode: true = orders go to paper_positions, false = real MT5 order_send. execution_path: which process is allowed to consume the signals table ('order_router' or 'klda_engine') — the other refuses to start.",
   "paper_mode": true,
   "execution_path": "order_router",
+  "_broker_time_comment": "Broker server time. rule 'ny_close' = America/New_York + 7h (UTC+2 in northern winter, UTC+3 in summer — Pepperstone's New-York-close convention). Falls back to utc_offset_hours if zoneinfo/tzdata is unavailable. Verify with monitoring/hourly_health_check.py --report (compares against MT5 tick time).",
+  "broker_time": {
+    "rule": "ny_close",
+    "utc_offset_hours": 3
+  },
+  "_intraday_comment": "Broker-time HH:MM. Rollover/swap is charged at 00:00 broker time. The order router takes no new entries at/after no_new_entries_after; the reconciler closes every open position at/after close_all_at, and any position opened on an earlier broker day.",
+  "intraday": {
+    "no_new_entries_after": "23:30",
+    "close_all_at": "23:45"
+  },
   "thresholds": {
     "default": {
       "mean_rev_threshold": -0.30,
@@ -11,7 +21,10 @@
       "max_tx_cost_pct": 0.15,
       "win_rate_baseline": 0.515,
       "kelly_fraction": 0.25,
-      "min_kelly_pct": 0.3
+      "min_kelly_pct": 0.3,
+      "_exit_comment": "Paper/live exit geometry, in % of entry. MUST match the backtest that produced the symbol's stats: database/backtest_5metric.py uses TARGET_PROFIT=0.005 (0.5%) and STOP_LOSS=0.01 (1.0%).",
+      "tp_pct": 0.5,
+      "sl_pct": 1.0
     },
     "SpotCrude": {
       "_comment": "Backtested 2026-07-17 on 14.6M ticks (Mar-Jul 2026): 243 trades, 58.4% win rate, p=0.005 vs 50% null — but NET NEGATIVE (-0.30%, PF 0.70) because the 0.5%TP/1.0%SL geometry needs 66.7% to break even. NOT validated for live use; kept for PAPER forward-testing only. Re-test with symmetric or 2:1 reward/risk TP/SL before trusting.",

@@ -1,0 +1,15 @@
+{
+  "_comment": "LIVE-ORDER ALLOWLIST. order_router and broker_adapter_mt5 refuse every LIVE order whose symbol is not listed under 'validated' here (paper orders are unaffected). An entry only counts if it clears the PROTOCOL gate: occurrences >= 100, win_rate >= 0.51, p_value < 0.05, and net_pnl_pct > 0. Add an entry only after the backtest AND the demo forward test both pass; record the evidence. Key = signal symbol; 'pattern' must match signals.pattern_name.",
+  "_example": {
+    "SYMBOL": {
+      "pattern": "MEAN_REVERSION",
+      "occurrences": 0,
+      "win_rate": 0.0,
+      "p_value": 1.0,
+      "net_pnl_pct": 0.0,
+      "validated_on": "YYYY-MM-DD",
+      "evidence": "path to report / commit hash"
+    }
+  },
+  "validated": {}
+}

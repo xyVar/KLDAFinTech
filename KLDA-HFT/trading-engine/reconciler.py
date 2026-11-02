@@ -4,6 +4,9 @@ KLDA-HFT Reconciler
 =====================
 Monitors open paper positions. Checks SL/TP conditions every 30s.
 Closes positions when price hits SL or TP.
+Intraday only: closes every open position at intraday.close_all_at (broker
+time, before the 00:00 rollover), plus any position opened on an earlier
+broker day (e.g. the reconciler was down over the cutoff).
 Reports daily P&L summary.
 
 Run: python reconciler.py
@@ -15,10 +18,11 @@ import MetaTrader5 as mt5
 from datetime import datetime, date
 import time
 
-from broker_adapter_mt5 import close_paper_position, ensure_paper_tables
+from broker_adapter_mt5 import close_paper_position, ensure_paper_tables, PAPER_MODE
+from config_loader import broker_now, to_broker_time, intraday_times
 
 DB_CONFIG = {
-    'host': 'localhost', 'port': 5432,
+    'host': '127.0.0.1', 'port': 5432,
     'database': 'KLDA-HFT_Database',
     'user': 'postgres', 'password': 'MyKldaTechnologies2025!'
 }
@@ -79,6 +83,34 @@ def check_sl_tp():
     return closed
 
 
+def close_end_of_day():
+    """Close open paper positions at/after the broker-time cutoff, or held from a prior broker day."""
+    ensure_paper_tables()
+    _, close_at = intraday_times()
+    bnow = broker_now()
+    past_cutoff = bnow.time() >= close_at
+
+    conn = get_conn()
+    cur  = conn.cursor()
+    cur.execute("SELECT id, symbol, opened_at FROM paper_positions WHERE status = 'OPEN'")
+    positions = cur.fetchall()
+    conn.close()
+
+    closed = 0
+    for pos_id, symbol, opened_at in positions:
+        overnight = to_broker_time(opened_at).date() < bnow.date()
+        if not (past_cutoff or overnight):
+            continue
+        why = 'held past broker day' if overnight else f'broker {bnow:%H:%M} >= {close_at:%H:%M}'
+        result = close_paper_position(pos_id)
+        if result.get('ok'):
+            log(f"EOD CLOSE {symbol} pos_id={pos_id} ({why}) | pnl={result['pnl_eur']:+} EUR")
+            closed += 1
+        else:
+            log(f"EOD CLOSE FAILED {symbol} pos_id={pos_id}: {result.get('reason')} — retrying next cycle")
+    return closed
+
+
 def daily_summary():
     """Print today's paper trading P&L."""
     ensure_paper_tables()
@@ -111,7 +143,8 @@ def daily_summary():
 
 
 def run_reconciliation():
-    closed = check_sl_tp()
+    closed = close_end_of_day()
+    closed += check_sl_tp()
     return closed
 
 
@@ -122,6 +155,10 @@ def main():
     log("=" * 60)
     log("KLDA Reconciler — STARTING")
     log(f"  Checks SL/TP every {POLL_INTERVAL}s")
+    log(f"  EOD close at {intraday_times()[1]:%H:%M} broker time (now {broker_now():%H:%M})")
+    if not PAPER_MODE:
+        log("  WARNING: paper_mode is false — this reconciler only manages PAPER positions;"
+            " live MT5 positions are NOT closed at end of day")
     log(f"  Daily summary every 60 cycles (~30 min)")
     log("=" * 60)
 
@@ -130,7 +167,7 @@ def main():
         try:
             closed = run_reconciliation()
             if closed > 0:
-                log(f"Closed {closed} position(s) via SL/TP")
+                log(f"Closed {closed} position(s) via EOD/SL/TP")
             cycle += 1
             if cycle % 60 == 0:
                 daily_summary()

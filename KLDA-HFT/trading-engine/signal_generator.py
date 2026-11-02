@@ -12,6 +12,9 @@ Flow:
 
 Run continuously:  python signal_generator.py
 Run once (daily):  python signal_generator.py --daily --symbol SpotCrude
+Scheduled:         python signal_generator.py --daily --symbol SpotCrude --at-broker 22:30
+                   (runs only inside a 15-min window at that BROKER time, once per day;
+                    the scheduled task polls every 15 min so PC timezone/DST don't matter)
                    one scan, writes signals, prints + saves an end-of-day report
 """
 
@@ -20,13 +23,13 @@ import psycopg2.extras
 import time
 import json
 import argparse
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from pathlib import Path
 import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-from config_loader import paper_mode, thresholds_for
+from config_loader import paper_mode, thresholds_for, broker_now
 
 # ── CONFIG ────────────────────────────────────────────────────────────────────
 DB_CONFIG = {
@@ -54,6 +57,7 @@ PAPER_MODE = paper_mode()
 
 # ── RUN CONTROL (not per-symbol) ─────────────────────────────────────────────
 LOOP_INTERVAL_SEC    = 10      # scan every 10s (continuous mode)
+AT_BROKER_WINDOW_MIN = 15      # --at-broker window; must equal the task's repeat interval
 MIN_BARS_REQUIRED    = 60      # need at least 60 bars to compute metrics
 MIN_CONFIDENCE       = 80.0    # need 4/5 or 5/5 conditions met
 
@@ -369,12 +373,28 @@ def main():
                     help='run one scan, write signals, save end-of-day report, exit')
     ap.add_argument('--symbol', default=None,
                     help='restrict to one symbol (e.g. SpotCrude); only with --daily')
+    ap.add_argument('--at-broker', default=None, metavar='HH:MM',
+                    help='only run if broker time is within HH:MM + 15 min (for the scheduled task)')
     args = ap.parse_args()
 
     if args.symbol and not args.daily:
         ap.error('--symbol requires --daily')
 
+    if args.at_broker and not args.daily:
+        ap.error('--at-broker requires --daily')
+
     if args.daily:
+        if args.at_broker:
+            h, m = (int(x) for x in args.at_broker.split(':'))
+            bnow = broker_now()
+            start = bnow.replace(hour=h, minute=m, second=0, microsecond=0)
+            done = REPORTS_DIR / f"daily_{date.today().isoformat()}_{args.symbol or 'ALL'}.txt"
+            if not (start <= bnow < start + timedelta(minutes=AT_BROKER_WINDOW_MIN)):
+                log(f"[SKIP] broker time {bnow:%H:%M} outside {args.at_broker}+{AT_BROKER_WINDOW_MIN}m window")
+                raise SystemExit(0)
+            if done.exists():
+                log(f"[SKIP] already ran today ({done.name})")
+                raise SystemExit(0)
         raise SystemExit(daily_run(args.symbol))
     main_loop()
 

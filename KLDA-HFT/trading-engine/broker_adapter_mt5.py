@@ -13,7 +13,7 @@ import MetaTrader5 as mt5
 import psycopg2
 from datetime import datetime
 
-from config_loader import paper_mode
+from config_loader import paper_mode, is_validated
 
 DB_CONFIG = {
     'host': '127.0.0.1', 'port': 5432,
@@ -140,7 +140,12 @@ def send_order(signal_id: int, symbol: str, action: str, lots: float,
         return {'ok': True, 'paper': True, 'position_id': pos_id, 'fill_price': fill_price}
 
     else:
-        # LIVE — real MT5 execution
+        # LIVE — real MT5 execution. Last line of defence: whatever the caller,
+        # never send a live order for a symbol off the validated allowlist.
+        ok, why = is_validated(symbol)
+        if not ok:
+            log(f"[LIVE]  REFUSED {symbol}: {why}")
+            return {'ok': False, 'reason': f'not_validated: {why}'}
         if not mt5.initialize():
             return {'ok': False, 'reason': f'mt5_init_failed: {mt5.last_error()}'}
 

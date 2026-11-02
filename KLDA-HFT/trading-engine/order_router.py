@@ -7,6 +7,11 @@ Lifecycle per signal:
   PENDING → check limits → send order → EXECUTING → fill confirmed → FILLED
                          ↘ blocked by risk gate → REJECTED
 
+Safety gates (before the risk gate):
+  - LIVE orders only for symbols in config/validated_patterns.json
+  - no new entries at/after intraday.no_new_entries_after (broker time)
+Exit geometry (SL/TP) comes from the per-symbol config — see thresholds_for().
+
 Run continuously:
   python order_router.py
 
@@ -20,16 +25,15 @@ from datetime import datetime
 
 from limits_enforcer import allow_trade, get_lot_size
 from broker_adapter_mt5 import send_order, PAPER_MODE
+from config_loader import thresholds_for, is_validated, broker_now, intraday_times
 
 DB_CONFIG = {
-    'host': 'localhost', 'port': 5432,
+    'host': '127.0.0.1', 'port': 5432,
     'database': 'KLDA-HFT_Database',
     'user': 'postgres', 'password': 'MyKldaTechnologies2025!'
 }
 
 POLL_INTERVAL = 5   # seconds between signal table scans
-SL_PCT = 0.5        # stop loss % from entry
-TP_PCT = 1.0        # take profit % from entry
 
 
 def log(msg):
@@ -42,7 +46,7 @@ def get_conn():
 
 def fetch_pending_signals(cur) -> list:
     cur.execute("""
-        SELECT id, symbol, action, price, confidence
+        SELECT id, symbol, action, price, confidence, pattern_name
         FROM signals
         WHERE status = 'PENDING'
         ORDER BY time ASC
@@ -69,7 +73,24 @@ def process_pending_signals():
         return 0
 
     processed = 0
-    for sig_id, symbol, action, price, confidence in signals:
+    no_entries_after, _ = intraday_times()
+    for sig_id, symbol, action, price, confidence, pattern in signals:
+
+        # 0 — Safety gates: validated-only live trading, intraday entry cutoff
+        if not PAPER_MODE:
+            ok, why = is_validated(symbol, pattern)
+            if not ok:
+                log(f"REJECTED sig_id={sig_id} {symbol}: live order refused — {why}")
+                mark_signal(cur, conn, sig_id, 'REJECTED', why)
+                processed += 1
+                continue
+        bnow = broker_now()
+        if bnow.time() >= no_entries_after:
+            why = f"intraday cutoff: broker {bnow:%H:%M} >= {no_entries_after:%H:%M}"
+            log(f"REJECTED sig_id={sig_id} {symbol}: {why}")
+            mark_signal(cur, conn, sig_id, 'REJECTED', why)
+            processed += 1
+            continue
 
         # 1 — Risk gate check
         allowed, reason = allow_trade(symbol, paper_mode=PAPER_MODE)
@@ -80,6 +101,7 @@ def process_pending_signals():
             continue
 
         lots = get_lot_size(symbol)
+        th   = thresholds_for(symbol)
 
         # 2 — Mark as executing
         mark_signal(cur, conn, sig_id, 'EXECUTING')
@@ -90,8 +112,8 @@ def process_pending_signals():
             symbol=symbol,
             action=action,
             lots=lots,
-            sl_pct=SL_PCT,
-            tp_pct=TP_PCT,
+            sl_pct=th['sl_pct'],
+            tp_pct=th['tp_pct'],
         )
 
         # 4 — Update signal status
@@ -113,7 +135,11 @@ def main():
     log("=" * 60)
     log("KLDA Order Router — STARTING")
     log(f"  Mode    : {'PAPER' if PAPER_MODE else 'LIVE'}")
-    log(f"  SL/TP   : {SL_PCT}% / {TP_PCT}%")
+    th = thresholds_for('default')
+    no_entries_after, _ = intraday_times()
+    log(f"  SL/TP   : {th['sl_pct']}% / {th['tp_pct']}% default (per-symbol: config/trading_config.json)")
+    log(f"  Live    : only symbols in config/validated_patterns.json")
+    log(f"  Entries : none at/after {no_entries_after:%H:%M} broker time (now {broker_now():%H:%M})")
     log(f"  Poll    : every {POLL_INTERVAL}s")
     log("=" * 60)
 

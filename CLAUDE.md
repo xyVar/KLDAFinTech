@@ -40,7 +40,7 @@ There is no test suite, linter, or CI. Python scripts run on system Python (need
 ```bash
 # Start/stop the whole stack (Postgres, bridge, C++ engine, API, engine, terminal)
 KLDA-HFT/start_all.bat
-KLDA-HFT/stop_all.bat        # WARNING: kills ALL python.exe on the machine
+KLDA-HFT/stop_all.bat        # surgical: kills only KLDA scripts, matched by command line
 
 # Run components individually (each from its own directory)
 python KLDA-HFT/python-bridge/mt5_tick_capture_ALL_TICKS.py   # tick capture
@@ -69,13 +69,14 @@ python KLDA-HFT/database/backup_db.py
 ## Hard-Won Constraints (violating these has broken the system before)
 
 - **DB host must be `127.0.0.1`, not `localhost`** — `::1` can be claimed by a WSL postgres relay with different credentials. DB credentials live in `.env` and inline `DB_CONFIG` dicts in the scripts.
-- **Broker server time is UTC+3.** All tick timestamps are broker time. Never judge feed freshness with `NOW() - last_updated`; check that `MAX(last_updated)` in `current` is *advancing* between polls (this is what watchdog.py does).
+- **Broker server time is UTC+3 in summer, UTC+2 in winter** (New-York-close convention; `config_loader.broker_now()` derives it — never use PC local time for trading-hour logic). All tick timestamps are broker time. Never judge feed freshness with `NOW() - last_updated`; check that `MAX(last_updated)` in `current` is *advancing* between polls (this is what watchdog.py does).
 - **Never `taskkill /F /IM python.exe`** in monitoring/automation code — it kills MCP servers, running backtests, and the watchdog itself. watchdog.py matches the bridge's command line via WMI; keep it that way.
 - **Don't strip the bridge's resilience features** (rotating file log, reconnect loop, `time_msc` dedup, 10s lookback). They exist because the feed silently died without them.
 - **`ticks.spread` is stored in points, not dollars.** `database/backtest_5metric.py` has a known bug treating it as dollars (tx_cost ~$18/trade swallows all gross gain) — fix units before trusting any backtest numbers.
 - **Don't run two backtests in parallel** — the machine OOMs.
 - **The live Pepperstone account (52028179) is trade-disabled at the broker** — `order_send` returns retcode 10017. Read-only API and `order_calc_*` work. The `.env` broker section is stale (old demo account, wrong leverage — real leverage is 1:30).
-- **Intraday only** — positions close before rollover to avoid swap costs; no overnight holds.
+- **Intraday only** — positions close before rollover to avoid swap costs; no overnight holds. Enforced: order_router takes no entries after `intraday.no_new_entries_after`, reconciler closes all at `intraday.close_all_at` (broker time, `config/trading_config.json`).
+- **Live orders only for symbols in `config/validated_patterns.json`** (checked in order_router AND broker_adapter_mt5). Keep `paper_mode: true` until an entry there is earned.
 - **Never search or glob into `vcpkg/`** — it's a vendored C++ dependency tree (hundreds of files of lz4/nlohmann-json noise). Scope searches to `KLDA-HFT/`.
 
 ## Component Notes
