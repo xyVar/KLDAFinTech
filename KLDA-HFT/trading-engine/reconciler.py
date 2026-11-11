@@ -39,6 +39,9 @@ def get_conn():
 
 
 def get_current_price(symbol: str, action: str) -> float | None:
+    if mt5.terminal_info() is None:        # session lost (MT5 restarted) or never started
+        if not mt5.initialize():
+            return None
     tick = mt5.symbol_info_tick(symbol)
     if tick is None:
         return None

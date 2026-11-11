@@ -90,6 +90,21 @@ def is_validated(symbol: str, pattern: str | None = None) -> tuple[bool, str]:
 
 
 # ── Broker time ───────────────────────────────────────────────────────────────
+def _nth_sunday_utc(year: int, month: int, n: int) -> datetime:
+    first = datetime(year, month, 1, tzinfo=timezone.utc)
+    return first + timedelta(days=(6 - first.weekday()) % 7, weeks=n - 1)
+
+
+def _ny_close_offset(at_utc: datetime) -> float:
+    """Broker UTC offset by the New-York-close rule, no tz database needed:
+    US DST runs 2nd Sunday of March 07:00 UTC to 1st Sunday of November 06:00 UTC
+    (New York UTC-5/-4, plus 7h => broker UTC+2 in winter, UTC+3 in summer)."""
+    y = at_utc.year
+    start = _nth_sunday_utc(y, 3, 2).replace(hour=7)
+    end = _nth_sunday_utc(y, 11, 1).replace(hour=6)
+    return 3.0 if start <= at_utc < end else 2.0
+
+
 def broker_utc_offset_hours(at_utc: datetime | None = None) -> float:
     """Broker server UTC offset at `at_utc` (default now)."""
     bt = get_config().get('broker_time', {})
@@ -99,8 +114,8 @@ def broker_utc_offset_hours(at_utc: datetime | None = None) -> float:
             from zoneinfo import ZoneInfo  # on Windows needs: pip install tzdata
             ny = at_utc.astimezone(ZoneInfo('America/New_York')).utcoffset()
             return ny.total_seconds() / 3600 + 7
-        except Exception:
-            pass
+        except Exception:                  # no tzdata (typical on Windows): use the built-in rule
+            return _ny_close_offset(at_utc.astimezone(timezone.utc))
     return float(bt.get('utc_offset_hours', 3))
 
 

@@ -106,15 +106,20 @@ def process_pending_signals():
         # 2 — Mark as executing
         mark_signal(cur, conn, sig_id, 'EXECUTING')
 
-        # 3 — Send order via adapter
-        result = send_order(
-            signal_id=sig_id,
-            symbol=symbol,
-            action=action,
-            lots=lots,
-            sl_pct=th['sl_pct'],
-            tp_pct=th['tp_pct'],
-        )
+        # 3 — Send order via adapter. An exception here used to leave the signal in
+        # EXECUTING, which signal_generator.has_pending_signal counts as open — that
+        # silenced the symbol permanently. Always end in FILLED or FAILED.
+        try:
+            result = send_order(
+                signal_id=sig_id,
+                symbol=symbol,
+                action=action,
+                lots=lots,
+                sl_pct=th['sl_pct'],
+                tp_pct=th['tp_pct'],
+            )
+        except Exception as e:
+            result = {'ok': False, 'reason': f'exception: {e}'}
 
         # 4 — Update signal status
         if result['ok']:

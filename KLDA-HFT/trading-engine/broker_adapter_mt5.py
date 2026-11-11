@@ -77,10 +77,15 @@ def ensure_paper_tables():
 
 def _get_current_price(symbol: str, action: str) -> float | None:
     """Get MT5 ask (BUY) or bid (SELL) for fill simulation."""
-    if not mt5.initialize():
+    # Only shut MT5 down if THIS call started the session. The reconciler keeps
+    # one session open for its SL/TP checks; shutting it down here made those
+    # checks return no price (and silently skip) after the first close.
+    was_up = mt5.terminal_info() is not None
+    if not was_up and not mt5.initialize():
         return None
     tick = mt5.symbol_info_tick(symbol)
-    mt5.shutdown()
+    if not was_up:
+        mt5.shutdown()
     if tick is None:
         return None
     return tick.ask if action == 'BUY' else tick.bid
