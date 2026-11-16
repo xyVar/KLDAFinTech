@@ -46,3 +46,11 @@ __pycache__/
 !strategy/*.md
 !docs/*.md
 !reports/*.html
+
+## Onboarding / identity documents — NEVER commit (passports, statements, extracts)
+onboarding_docs/
+*.pdf
+*.jpg
+*.jpeg
+*.png
+.env
