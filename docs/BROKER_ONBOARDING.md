@@ -98,17 +98,16 @@ Items 5 and 7 are the usual blockers.
 - **IBKR support:** current onboarding policy for the owner's country of residence; which IBKR
   entity holds the account; demo/paper account rules.
 
-## 7. Why the two earlier IBKR applications may have stalled (checklist to review)
+## 7. The two earlier IBKR applications (facts, owner-provided 2026-11-19)
 
-- application left incomplete and auto-closed
-- individual account started where a corporate one was needed (or the reverse)
-- residence declared as Estonia while documents showed another address
-- proof of address missing, expired, or not matching the declared address
-- source of funds not documented
-- a passport or document expired during the process
-
-Owner to note which of these applied, in `docs/evidence/s5/ibkr_previous_attempts.md`, so the
-third attempt does not repeat it.
+- Both were **individual (personal) applications from Albania**, not corporate ones.
+- Both were closed with IBKR's standard discretionary-decline notice ("sole discretion, but not the
+  obligation" to give a reason). No document was flagged; no reason was given.
+- So there is nothing specific to "fix" from them. The most likely factor is country risk on the
+  applicant's residence (Albania was on the FATF increased-monitoring list from 2020 until late 2023;
+  verify), but IBKR never says.
+- The corporate application is a different review, under the EU entity, years later. It does not
+  inherit the decline. It does mean the pre-qualification question (section 4, step 1) comes first.
 
 ## 8. What the software needs once the account exists
 
@@ -118,3 +117,34 @@ third attempt does not repeat it.
 - sizing rule: 1% of allocated capital per trade, from contract specifications, replacing the
   fixed 0.01-lot placeholder
 - Pepperstone live account: logged out and marked "never trade" in `config/accounts.json`
+
+## 9. If IBKR declines: serious alternatives, ranked
+
+Any institution can decline at its discretion; the risk cannot be removed, only spread. Ask every
+candidate the same pre-qualification question (section 4, step 1) and declare identical facts to all.
+Whether each one onboards an Albania-resident director **today** is unknown until asked.
+
+| Institution | What it is | Platform | Fits today's software |
+|---|---|---|---|
+| Saxo Bank (Denmark) | licensed bank | own platform + OpenAPI | new adapter needed |
+| Swissquote (Switzerland, listed) | licensed bank | MT5 + own | yes — MT5 bridge works as is |
+| Dukascopy (Switzerland) | licensed bank | MT5 + JForex | yes — MT5 bridge works as is |
+| Admirals (Tallinn, Estonia) | investment firm licensed by Finantsinspektsioon | MT5 | yes — and same country as KLDA |
+| IBKR (Ireland entity) | listed broker | own API | new adapter needed |
+
+Not a real alternative: LYNX and other IBKR introducing brokers — the account is still opened by
+IBKR, so the same decision applies.
+
+What weighs the same at every institution, and what KLDA controls:
+- director's residence (not controllable; weighs less when the client is an EU company with an EU
+  account and complete documents)
+- source of wealth paper trail: service invoices → KLDA revenue → retained earnings (controllable)
+- business-activity mismatch: an ads/CRM company opening a trading account — add an EMTAK code such
+  as 64.99 and state the purpose plainly (controllable)
+- funding account: Wise Business is an e-money institution, not a bank; most brokers accept it, but a
+  bank account in the company's name reads stronger to some compliance teams (if obtainable)
+
+Operating rule once approved: keep a **primary and a backup** account at two institutions, so one
+counterparty restricting the account does not stop the system. The software stays broker-agnostic:
+the order router talks to an adapter (`trading-engine/broker_adapter_mt5.py` today); each new broker
+is another adapter behind the same safety gates.

@@ -23,7 +23,7 @@ Declared facts (from the owner, 2026-11-16):
 | 8 | Company tax number (EE) + owner's personal tax ID (AL) | ☑ have | | |
 | 9 | **Wise Business** account in the company's name (KLDA Technologies OÜ IBAN) | ☑ exists | | confirm it is the business account, not personal Wise: IBKR matches the sender name to the account holder and returns mismatched wires |
 | 10 | IBKR pre-qualification answers (support chat) | ☐ | `docs/evidence/s5/` | one message: (1) does IBKR Ireland accept an Estonian OÜ whose director/owner is resident in Albania; (2) which account type for a company trading its own capital via the API; (3) can it be funded from a Wise Business account in the company's name |
-| 11 | Notes on the two earlier stalled applications | ☐ | `docs/evidence/s5/` | which item of BROKER_ONBOARDING §7 applied |
+| 11 | The two earlier IBKR applications | ☑ known | | individual applications from Albania; both closed with IBKR's standard no-reason decline. Details in BROKER_ONBOARDING §7 |
 
 Rules
 - Documents live in the `onboarding_docs` folder on the PC, never in chat, never in git.
