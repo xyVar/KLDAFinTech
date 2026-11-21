@@ -118,33 +118,34 @@ Items 5 and 7 are the usual blockers.
   fixed 0.01-lot placeholder
 - Pepperstone live account: logged out and marked "never trade" in `config/accounts.json`
 
-## 9. If IBKR declines: serious alternatives, ranked
+## 9. IBKR is the chosen institution — lowering the risk of an unexplained decline
 
-Any institution can decline at its discretion; the risk cannot be removed, only spread. Ask every
-candidate the same pre-qualification question (section 4, step 1) and declare identical facts to all.
-Whether each one onboards an Albania-resident director **today** is unknown until asked.
+Owner decision 2026-11-21: **IBKR corporate account is the target.** Retail CFD/MT5 brokers are
+rejected (the broker is the counterparty to every trade). Prime brokers are out of reach at this
+capital size.
 
-| Institution | What it is | Platform | Fits today's software |
-|---|---|---|---|
-| Saxo Bank (Denmark) | licensed bank | own platform + OpenAPI | new adapter needed |
-| Swissquote (Switzerland, listed) | licensed bank | MT5 + own | yes — MT5 bridge works as is |
-| Dukascopy (Switzerland) | licensed bank | MT5 + JForex | yes — MT5 bridge works as is |
-| Admirals (Tallinn, Estonia) | investment firm licensed by Finantsinspektsioon | MT5 | yes — and same country as KLDA |
-| IBKR (Ireland entity) | listed broker | own API | new adapter needed |
+Before applying
+1. Pre-qualify by chat or phone. A "no" there costs nothing and leaves no new declined application.
+2. Disclose any earlier declined applications. IBKR will match the same person anyway;
+   volunteering it reads as transparency.
+3. Fix what KLDA controls: an EMTAK code for the activity (e.g. 64.99) next to the existing one;
+   purpose stated plainly; source of wealth = service invoices → retained earnings; funding account
+   in the company's name.
+4. Submit everything in one sitting, every name, address and date matching the documents.
+5. Optional: a GDPR Article 15 access request for the data IBKR holds on earlier applications
+   (applies to IBKR's EU/UK entities). Anti-money-laundering notes may lawfully be withheld.
 
-Not a real alternative: LYNX and other IBKR introducing brokers — the account is still opened by
-IBKR, so the same decision applies.
+Pre-qualification message: template held outside the repo (personal details). It asks:
+(1) whether IBKR accepts a corporate application for an Estonian OÜ given the director's country of
+residence; (2) which account type suits a company trading its own capital in micro futures via the
+API; (3) whether a Wise Business account in the company's name can fund it; (4) whether earlier
+declined applications would prevent this one. Save the reply outside the repo; record only
+the outcome here.
 
-What weighs the same at every institution, and what KLDA controls:
-- director's residence (not controllable; weighs less when the client is an EU company with an EU
-  account and complete documents)
-- source of wealth paper trail: service invoices → KLDA revenue → retained earnings (controllable)
-- business-activity mismatch: an ads/CRM company opening a trading account — add an EMTAK code such
-  as 64.99 and state the purpose plainly (controllable)
-- funding account: Wise Business is an e-money institution, not a bank; most brokers accept it, but a
-  bank account in the company's name reads stronger to some compliance teams (if obtainable)
-
-Operating rule once approved: keep a **primary and a backup** account at two institutions, so one
-counterparty restricting the account does not stop the system. The software stays broker-agnostic:
-the order router talks to an adapter (`trading-engine/broker_adapter_mt5.py` today); each new broker
-is another adapter behind the same safety gates.
+If IBKR still declines
+- Plan B at the same tier: Saxo Bank (licensed Danish bank, exchange access), or an introducing
+  broker whose trades clear at a futures clearing firm (StoneX, Marex, ADM Investor Services).
+- A decline does not stop stages S0–S2 (data, research, paper trading). Applying early means a
+  "no" is found while there is still time.
+- The software stays broker-agnostic: each institution is one adapter behind the same order router
+  and safety gates.
