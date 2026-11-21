@@ -149,3 +149,48 @@ If IBKR still declines
   "no" is found while there is still time.
 - The software stays broker-agnostic: each institution is one adapter behind the same order router
   and safety gates.
+
+## 10. What IBKR's own pages say (fetched 2026-11-21)
+
+Sources: interactivebrokers.com/en/accounts/configuring-your-account.php,
+/en/accounts/account-guide.php, /en/accounts/required-minimums.php,
+/en/accounts/trading-and-market-data.php, /en/accounts/legalDocuments/custIdentificationNotice.php.
+These are IBKR's global (US-site) pages; IBKR states that account types, margin and products
+"vary by country of residence and IBKR legal entity", so the EU entity's form may differ in detail.
+
+**Account type for KLDA:** "Small Businesses — for corporations, LLCs, partnerships and operating
+businesses" (account guide: "a single account which holds assets owned by the entity account
+holder"; Cash, Reg T and Portfolio Margin available). The "Proprietary Trading Firms" type is for
+multi-trader firms; with one trader, Small Business / Organization fits. Confirm in pre-qualification.
+
+**Documents IBKR lists for institutional accounts:**
+- formation documents (articles of association)
+- tax identification number
+- a completed **beneficial ownership certification** (a form filled in during the application)
+- ID information for every **authorized user** (each person who will log in or trade)
+- a **corporate resolution** authorising the account and the authorised users — not on our list
+  before; for an OÜ this is a written decision of the board / sole shareholder
+
+**What the application assesses:** entity type, regulatory status, financial profile, trading
+experience, jurisdiction. The individual form asks income, net worth, liquid net worth, years of
+experience per asset class, bank details and an **intended deposit amount** (an estimate, not a
+commitment); expect equivalent questions for the company.
+
+**Futures:** "Futures trading requires specific approval. Approval is based on trading experience,
+financial profile, and regulatory requirements." No numeric threshold is published. Under EU rules
+(MiFID II) a non-advised client trading complex products such as futures is also given an
+appropriateness check of knowledge and experience — answer it truthfully.
+
+**Margin and shorting:** a Cash account cannot borrow or short. A Margin account allows both;
+minimum equity **USD 2,000** to open margin. Portfolio Margin requires **USD 110,000**. "Futures
+margin is performance collateral, not a loan." Positions may be reduced or liquidated if
+maintenance margin is not met.
+
+**Costs on the IBKR Pro, Org account line:** account minimum USD 0.00, inactivity fee USD 0.00.
+TWS API and REST API over the internet: USD 0.00 monthly minimum. FIX connections: USD 1,500/month
+minimum — not needed. Real-time data requires paid exchange subscriptions; institutional accounts
+may be charged professional data fees — ask the price for CME and Eurex data in pre-qualification.
+
+**Identity rule (Customer Identification Program):** IBKR must obtain, verify and record identity
+for the entity and "persons related to your organization", may request documents such as articles
+of incorporation, and "may not be able to open your account" without them.

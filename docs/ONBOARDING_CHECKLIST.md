@@ -24,6 +24,9 @@ Declared facts (from the owner, 2026-11-16):
 | 9 | **Wise Business** account in the company's name (KLDA Technologies OÜ IBAN) | ☑ exists | | confirm it is the business account, not personal Wise: IBKR matches the sender name to the account holder and returns mismatched wires |
 | 10 | IBKR pre-qualification answers (support chat) | ☐ | `docs/evidence/s5/` | one message: (1) does IBKR Ireland accept an Estonian OÜ whose director/owner is resident in Albania; (2) which account type for a company trading its own capital via the API; (3) can it be funded from a Wise Business account in the company's name |
 | 11 | The two earlier IBKR applications | ☑ known | | individual applications from Albania; both closed with IBKR's standard no-reason decline. Details in BROKER_ONBOARDING §7 |
+| 12 | Corporate resolution (written decision of the board / sole shareholder) authorising the IBKR account and naming the authorised user(s) | ☐ | | required by IBKR for institutional accounts; draft with the Estonian accountant or Xolo |
+| 13 | Beneficial ownership certification | ☐ | | a form inside the IBKR application; same facts as the registry extract |
+| 14 | Financial profile of the company (revenue, net worth, liquid assets) and trading experience (years, asset classes) | ☐ | | answer truthfully; also feeds the futures approval and the MiFID appropriateness check |
 
 Rules
 - Documents live in the `onboarding_docs` folder on the PC, never in chat, never in git.
