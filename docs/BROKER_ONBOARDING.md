@@ -103,9 +103,10 @@ Items 5 and 7 are the usual blockers.
 - Both were **individual (personal) applications from Albania**, not corporate ones.
 - Both were closed with IBKR's standard discretionary-decline notice ("sole discretion, but not the
   obligation" to give a reason). No document was flagged; no reason was given.
-- So there is nothing specific to "fix" from them. The most likely factor is country risk on the
-  applicant's residence (Albania was on the FATF increased-monitoring list from 2020 until late 2023;
-  verify), but IBKR never says.
+- So there is nothing specific to "fix" from them. IBKR's own list of accepted countries
+  (interactivebrokers.com/en/accounts/open-account-country-list.php, read 2026-11-23) includes both
+  Albania and Estonia with no footnote, so it was **not a country ban**: those were case-by-case
+  discretionary decisions, and IBKR never gives the reason.
 - The corporate application is a different review, under the EU entity, years later. It does not
   inherit the decline. It does mean the pre-qualification question (section 4, step 1) comes first.
 
