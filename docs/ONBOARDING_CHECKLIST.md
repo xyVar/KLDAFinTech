@@ -13,12 +13,12 @@ Declared facts (from the owner, 2026-11-16):
 
 | # | Document | Status | Where kept | Notes |
 |---|---|---|---|---|
-| 1 | Company registry extract (*registrikaart*) — from `ariregister.rik.ee`, log in with the e-Residency card | ☐ | | < 3 months old; also serves as 3 and 6 |
-| 2 | Articles of association (*põhikiri*) — same site, same download | ☐ | | |
-| 3 | Directors + beneficial owners | ☐ | | covered by 1 |
+| 1 | Company registry extract (*registrikaart*) — from `ariregister.rik.ee`, log in with the e-Residency card | ☑ have | | < 3 months old; also serves as 3 and 6 |
+| 2 | Articles of association (*põhikiri*) — same site, same download | ☑ have | | |
+| 3 | Directors + beneficial owners | ☑ have | | covered by 1 |
 | 4 | Owner's passport | ☑ have | | check expiry covers the next 6 months |
 | 5 | Owner's personal proof of address | ☑ ready | | Albanian bank statement, Oct 2026, Tirana address — the address in the application must match it character for character; keep the original language |
-| 6 | Company registered-address proof | ☐ | | the address on the registry extract (service-provider address is normal); no separate document |
+| 6 | Company registered-address proof | ☑ have | | the address on the registry extract (service-provider address is normal); no separate document |
 | 7 | Source of **wealth** of the company (IBKR asks where the company's money comes from in general, not for a deposit amount) | ☐ | | answer: revenue from KLDA Technologies' services; evidence: a recent Wise Business statement showing normal activity. **No funding amount is committed at application time**; funding comes later, in slices, after the strategy passes its tests |
 | 8 | Company tax number (EE) + owner's personal tax ID (AL) | ☑ have | | |
 | 9 | **Wise Business** account in the company's name (KLDA Technologies OÜ IBAN) | ☑ exists | | confirm it is the business account, not personal Wise: IBKR matches the sender name to the account holder and returns mismatched wires |
@@ -27,6 +27,8 @@ Declared facts (from the owner, 2026-11-16):
 | 12 | Corporate resolution (written decision of the board / sole shareholder) authorising the IBKR account and naming the authorised user(s) | ☐ | | required by IBKR for institutional accounts; draft with the Estonian accountant or Xolo |
 | 13 | Beneficial ownership certification | ☐ | | a form inside the IBKR application; same facts as the registry extract |
 | 14 | Financial profile of the company (revenue, net worth, liquid assets) and trading experience (years, asset classes) | ☐ | | answer truthfully; also feeds the futures approval and the MiFID appropriateness check |
+| 15 | Company net assets restored before applying (Commercial Code § 176; the 2025 annual report itself flags it) — e.g. convert the owner's claim against the company into equity, done by the accountant / Xolo | ☐ | | IBKR can read the public annual report; a negative balance sheet weakens the financial profile and the futures permission |
+| 16 | 2026 interim figures (balance sheet + P&L to date) showing the service revenue | ☐ | | the filed 2025 report shows the start-up period only; this is the evidence for source of wealth |
 
 Rules
 - Documents live in the `onboarding_docs` folder on the PC, never in chat, never in git.
