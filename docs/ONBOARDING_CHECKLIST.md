@@ -27,7 +27,7 @@ Declared facts (from the owner, 2026-11-16):
 | 12 | Corporate resolution (written decision of the board / sole shareholder) authorising the IBKR account and naming the authorised user(s) | ☐ | | required by IBKR for institutional accounts; draft with the Estonian accountant or Xolo |
 | 13 | Beneficial ownership certification | ☐ | | a form inside the IBKR application; same facts as the registry extract |
 | 14 | Financial profile of the company (revenue, net worth, liquid assets) and trading experience (years, asset classes) | ☐ | | answer truthfully; also feeds the futures approval and the MiFID appropriateness check |
-| 15 | Company net assets restored before applying (Commercial Code § 176; the 2025 annual report itself flags it) — e.g. convert the owner's claim against the company into equity, done by the accountant / Xolo | ☐ | | IBKR can read the public annual report; a negative balance sheet weakens the financial profile and the futures permission |
+| 15 | Company net assets restored (Commercial Code § 176, flagged in the 2025 annual report). **Owner decision 2026-11-23: restore through 2026 operating profit; the owner's loan to the company stays a loan** (repayable tax-free). Record it as a written sole-shareholder decision; equity conversion only as a fallback if 2026 profit falls short | ☐ | | IBKR can read the public annual report; the 2026 interim figures (item 16) show the recovery |
 | 16 | 2026 interim figures (balance sheet + P&L to date) showing the service revenue | ☐ | | the filed 2025 report shows the start-up period only; this is the evidence for source of wealth |
 
 Rules
